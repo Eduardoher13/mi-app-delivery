@@ -34,7 +34,8 @@
     "start:clear": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "sha:android": "bash scripts/android-sha1.sh"
   },
   "private": true
 }

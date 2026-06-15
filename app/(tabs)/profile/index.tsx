@@ -1,11 +1,11 @@
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { MapPreview } from '../../components/MapPreview';
-import { useAuth } from '../../contexts/AuthContext';
-import { useImageUpload } from '../../hooks/useImageUpload';
-import { useLocation } from '../../hooks/useLocation';
-import { MOCK_USER } from '../../utils/constants';
+import { MapPreview } from '../../../components/MapPreview';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useImageUpload } from '../../../hooks/useImageUpload';
+import { useLocation } from '../../../hooks/useLocation';
+import { MOCK_USER } from '../../../utils/constants';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
@@ -44,7 +44,7 @@ export default function ProfileScreen() {
               <ActivityIndicator color="#FFFFFF" />
             ) : (
               <Text className="text-xs font-bold text-white">
-                Subir foto (mock)
+                Subir foto
               </Text>
             )}
           </Pressable>

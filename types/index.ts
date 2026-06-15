@@ -19,6 +19,17 @@ export interface Product {
   category: string;
 }
 
+export interface ApiProduct {
+  id: string;
+  company_id: string;
+  name: string;
+  description: string;
+  price: string;
+  stock: number;
+  avg_rating: string;
+  is_active: boolean;
+}
+
 export interface ServiceProvider {
   id: string;
   name: string;

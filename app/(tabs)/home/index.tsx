@@ -2,24 +2,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { BannerPromo } from '../../components/BannerPromo';
-import { CategoryGrid } from '../../components/CategoryGrid';
-import { FloatingCart } from '../../components/FloatingCart';
-import { ProductCard } from '../../components/ProductCard';
-import { QuickActionButton } from '../../components/QuickActionButton';
-import { ServiceRequestCard } from '../../components/ServiceRequestCard';
-import { useAuth } from '../../contexts/AuthContext';
+import { BannerPromo } from '../../../components/BannerPromo';
+import { CategoryGrid } from '../../../components/CategoryGrid';
+import { FloatingCart } from '../../../components/FloatingCart';
+import { ProductCard } from '../../../components/ProductCard';
+import { QuickActionButton } from '../../../components/QuickActionButton';
+import { ServiceRequestCard } from '../../../components/ServiceRequestCard';
 import {
   CATEGORIES,
   FEATURED_SERVICES,
   MOCK_CART,
   MOCK_USER,
   RECOMMENDED_PRODUCTS,
-} from '../../utils/constants';
+} from '../../../utils/constants';
 
 export default function HomeScreen() {
-  const { user } = useAuth();
-
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <View className="flex-1">
@@ -106,11 +103,6 @@ export default function HomeScreen() {
             ))}
           </View>
 
-          {user && (
-            <Text className="mt-6 text-center text-xs text-[#94A3B8]">
-              Sesión: {user.name}
-            </Text>
-          )}
         </ScrollView>
 
         <FloatingCart

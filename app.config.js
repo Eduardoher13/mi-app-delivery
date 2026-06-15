@@ -18,10 +18,8 @@ module.exports = ({ config }) => ({
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: '#E6F4FE',
-      foregroundImage: './assets/android-icon-foreground.png',
-      backgroundImage: './assets/android-icon-background.png',
-      monochromeImage: './assets/android-icon-monochrome.png',
+      backgroundColor: '#00A878',
+      foregroundImage: './assets/icon.png',
     },
     package: 'com.casaia.app',
     config: {
@@ -31,7 +29,7 @@ module.exports = ({ config }) => ({
     },
   },
   web: {
-    favicon: './assets/favicon.png',
+    favicon: './assets/icon.png',
     bundler: 'metro',
   },
   plugins: [
