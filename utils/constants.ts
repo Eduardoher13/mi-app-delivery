@@ -72,3 +72,12 @@ export const MANAGUA_COORDS = {
 } as const;
 
 export const AUTH_TOKEN_KEY = '@casaia/auth_token';
+export const AUTH_USER_KEY = '@casaia/user';
+
+/** Usuario empresa del seed del backend (npm run seed en casa-ia-desk) */
+export const DEMO_EMPRESA_EMAIL = 'tienda@empresa.com';
+
+/** Supabase Storage — un bucket con carpetas internas */
+export const SUPABASE_STORAGE_BUCKET = 'product_images';
+export const SUPABASE_FOLDER_AVATARS = 'avatars';
+export const SUPABASE_FOLDER_PRODUCTS = 'image-product';

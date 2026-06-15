@@ -8,6 +8,7 @@
     "axios": "^1.17.0",
     "expo": "^54.0.0",
     "expo-constants": "~18.0.13",
+    "expo-file-system": "~19.0.23",
     "expo-image-picker": "~17.0.11",
     "expo-linking": "~8.0.12",
     "expo-location": "~19.0.8",
@@ -35,7 +36,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "sha:android": "bash scripts/android-sha1.sh"
+    "sha:android": "bash scripts/android-sha1.sh",
+    "verify:supabase": "bash scripts/verify-supabase.sh"
   },
   "private": true
 }

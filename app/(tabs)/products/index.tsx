@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProductCard } from '../../../components/ProductCard';
-import { getProducts } from '../../../services/api';
+import { getProducts } from '../../../services/products';
 import { Product } from '../../../types';
 
 export default function ProductsScreen() {
@@ -50,7 +50,7 @@ export default function ProductsScreen() {
         <Text className="mt-1 text-sm text-[#94A3B8]">
           {products.length > 0
             ? `${products.length} productos del backend`
-            : 'Catálogo desde GET /products'}
+            : 'Catálogo desde GET /products/active'}
         </Text>
 
         {loading ? (

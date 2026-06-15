@@ -1,4 +1,6 @@
 /** @type {import('expo/config').ExpoConfig} */
+require('dotenv').config({ path: '.env' });
+
 module.exports = ({ config }) => ({
   ...config,
   name: 'CasaIA',

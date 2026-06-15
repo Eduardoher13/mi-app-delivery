@@ -1,9 +1,15 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useState } from 'react';
 
+import { isSupabaseConfigured } from '../services/supabase';
+import { uploadImageUri } from '../services/storageUpload';
+import { SUPABASE_STORAGE_BUCKET } from '../utils/constants';
+
 interface UploadImageOptions {
   bucket?: string;
   folder?: string;
+  /** Si se define, se usa en lugar de `${folder}/${Date.now()}.jpg` */
+  path?: string;
 }
 
 interface UseImageUploadResult {
@@ -39,30 +45,26 @@ export function useImageUpload(): UseImageUploadResult {
 
   const uploadImage = useCallback(
     async (uri: string, options?: UploadImageOptions): Promise<string> => {
+      if (!isSupabaseConfigured()) {
+        const message =
+          'Supabase no configurado. Revisa .env y reinicia Metro: npx expo start --clear';
+        setError(message);
+        throw new Error(message);
+      }
+
       setUploading(true);
       setError(null);
 
       try {
-        // TODO: reemplazar con subida real a Supabase Storage
-        // const bucket = options?.bucket ?? 'avatars';
-        // const fileName = `${options?.folder ?? 'uploads'}/${Date.now()}.jpg`;
-        // const response = await fetch(uri);
-        // const blob = await response.blob();
-        // const { data, error: uploadError } = await supabase.storage
-        //   .from(bucket)
-        //   .upload(fileName, blob, { contentType: 'image/jpeg' });
-        // if (uploadError) throw uploadError;
-        // const { data: publicUrl } = supabase.storage.from(bucket).getPublicUrl(data.path);
-        // return publicUrl.publicUrl;
-
-        void uri;
-        void options;
-
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        return `https://picsum.photos/seed/upload-${Date.now()}/400/400`;
-      } catch {
-        const message = 'Error al subir la imagen';
+        const result = await uploadImageUri(uri, {
+          bucket: options?.bucket ?? SUPABASE_STORAGE_BUCKET,
+          folder: options?.folder,
+          path: options?.path,
+        });
+        return result.publicUrl;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Error al subir la imagen';
         setError(message);
         throw new Error(message);
       } finally {

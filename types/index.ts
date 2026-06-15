@@ -2,6 +2,7 @@ export interface User {
   id: string;
   name: string;
   email?: string;
+  role?: string;
   avatarUrl?: string;
 }
 
@@ -24,10 +25,19 @@ export interface ApiProduct {
   company_id: string;
   name: string;
   description: string;
+  image_url?: string | null;
   price: string;
   stock: number;
   avg_rating: string;
   is_active: boolean;
+}
+
+export interface Company {
+  id: string;
+  user_id: string;
+  commercial_name: string;
+  ruc?: string | null;
+  logo_url?: string | null;
 }
 
 export interface ServiceProvider {

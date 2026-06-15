@@ -3,11 +3,13 @@ import { ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BannerPromo } from '../../../components/BannerPromo';
+import { Avatar } from '../../../components/Avatar';
 import { CategoryGrid } from '../../../components/CategoryGrid';
 import { FloatingCart } from '../../../components/FloatingCart';
 import { ProductCard } from '../../../components/ProductCard';
 import { QuickActionButton } from '../../../components/QuickActionButton';
 import { ServiceRequestCard } from '../../../components/ServiceRequestCard';
+import { useAuth } from '../../../contexts/AuthContext';
 import {
   CATEGORIES,
   FEATURED_SERVICES,
@@ -17,6 +19,7 @@ import {
 } from '../../../utils/constants';
 
 export default function HomeScreen() {
+  const { user } = useAuth();
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <View className="flex-1">
@@ -39,11 +42,11 @@ export default function HomeScreen() {
               <View className="h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white">
                 <Ionicons name="notifications-outline" size={20} color="#0F172A" />
               </View>
-              <View className="h-10 w-10 items-center justify-center rounded-full bg-[#00A878]">
-                <Text className="text-sm font-bold text-white">
-                  {MOCK_USER.initials}
-                </Text>
-              </View>
+              <Avatar
+                name={user?.name ?? MOCK_USER.name}
+                avatarUrl={user?.avatarUrl}
+                size={40}
+              />
             </View>
           </View>
 

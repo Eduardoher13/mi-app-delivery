@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
 
-import { ApiProduct, Product } from '../types';
 import { AUTH_TOKEN_KEY } from '../utils/constants';
 
 const apiBaseUrl =
@@ -28,27 +27,5 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error),
 );
-
-function extractImageUrl(description: string): string {
-  const match = description.match(/Imagen:\s*(https?:\/\/\S+)/);
-  return match?.[1] ?? 'https://picsum.photos/seed/product/400/400';
-}
-
-function mapApiProduct(product: ApiProduct): Product {
-  return {
-    id: product.id,
-    name: product.name,
-    price: Number.parseFloat(product.price),
-    imageUrl: extractImageUrl(product.description),
-    category: 'Ferretería',
-  };
-}
-
-/** GET /products — el backend devuelve [items, total] */
-export async function getProducts(): Promise<Product[]> {
-  const { data } = await api.get<[ApiProduct[], number]>('/products');
-  const [items] = data;
-  return items.filter((p) => p.is_active).map(mapApiProduct);
-}
 
 export default api;
