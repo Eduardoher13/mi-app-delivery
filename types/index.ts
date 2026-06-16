@@ -30,6 +30,10 @@ export interface ApiProduct {
   stock: number;
   avg_rating: string;
   is_active: boolean;
+  company?: {
+    id: string;
+    commercial_name: string;
+  };
 }
 
 export interface Company {

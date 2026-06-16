@@ -17,6 +17,11 @@ module.exports = ({ config }) => ({
     config: {
       googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
     },
+    infoPlist: {
+      NSAppTransportSecurity: {
+        NSAllowsLocalNetworking: true,
+      },
+    },
   },
   android: {
     adaptiveIcon: {
@@ -24,6 +29,7 @@ module.exports = ({ config }) => ({
       foregroundImage: './assets/icon.png',
     },
     package: 'com.casaia.app',
+    usesCleartextTraffic: true,
     config: {
       googleMaps: {
         apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',

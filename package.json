@@ -37,7 +37,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "sha:android": "bash scripts/android-sha1.sh",
-    "verify:supabase": "bash scripts/verify-supabase.sh"
+    "verify:supabase": "bash scripts/verify-supabase.sh",
+    "verify:api": "bash scripts/verify-api.sh"
   },
   "private": true
 }

@@ -51,25 +51,27 @@ export function mapApiProduct(product: ApiProduct): Product {
     name: product.name,
     price: Number.parseFloat(product.price),
     imageUrl: product.image_url ?? FALLBACK_PRODUCT_IMAGE,
-    category: 'Ferretería',
+    category: product.company?.commercial_name ?? 'Ferretería',
   };
 }
 
 export async function getActiveProducts(
-  skip?: number,
-  take?: number,
-  search?: string,
+  options?: {
+    offset?: number;
+    limit?: number;
+    q?: string;
+  },
 ): Promise<Product[]> {
   const params: Record<string, string | number> = {};
 
-  if (skip !== undefined) {
-    params.offset = skip;
+  if (options?.offset !== undefined) {
+    params.offset = options.offset;
   }
-  if (take !== undefined) {
-    params.limit = take;
+  if (options?.limit !== undefined) {
+    params.limit = options.limit;
   }
-  if (search) {
-    params.search = search;
+  if (options?.q?.trim()) {
+    params.q = options.q.trim();
   }
 
   const { data } = await api.get<ListResponse<ApiProduct>>('/products/active', {
@@ -80,9 +82,18 @@ export async function getActiveProducts(
   return items.filter((p) => p.is_active).map(mapApiProduct);
 }
 
-export async function getProductsByCompany(companyId: string): Promise<Product[]> {
+export async function getProductsByCompany(
+  companyId: string,
+  q?: string,
+): Promise<Product[]> {
+  const params: Record<string, string> = {};
+  if (q?.trim()) {
+    params.q = q.trim();
+  }
+
   const { data } = await api.get<ListResponse<ApiProduct>>(
     `/products/by-company/${companyId}`,
+    { params },
   );
   const { items } = parseListResponse(data);
   return items.filter((p) => p.is_active).map(mapApiProduct);
@@ -124,6 +135,6 @@ export async function getStorefront(companyId: string): Promise<StorefrontRespon
 }
 
 /** Alias para pantallas existentes — usa GET /products/active */
-export async function getProducts(): Promise<Product[]> {
-  return getActiveProducts();
+export async function getProducts(q?: string): Promise<Product[]> {
+  return getActiveProducts({ q });
 }
