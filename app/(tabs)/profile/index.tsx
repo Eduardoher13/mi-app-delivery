@@ -1,5 +1,6 @@
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '../../../components/Avatar';
@@ -22,18 +23,21 @@ import {
 } from '../../../utils/constants';
 
 export default function ProfileScreen() {
-  const { user, signOut, updateAvatarUrl, loginAsEmpresaDemo } = useAuth();
+  const router = useRouter();
+  const { user, signOut, updateAvatarUrl, loginAsEmpresaDemo, loginAsClienteDemo } = useAuth();
   const { coords, loading: locationLoading } = useLocation();
   const { uploading, error, pickImage, uploadImage } = useImageUpload();
   const [testMessage, setTestMessage] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
   const [switchingRole, setSwitchingRole] = useState(false);
+  const [switchingCliente, setSwitchingCliente] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [companyError, setCompanyError] = useState<string | null>(null);
   const supabaseStatus = getSupabaseStatus();
   const supabaseDebug = resolveSupabaseConfigForDebug();
 
   const isEmpresa = user?.role === 'empresa';
+  const isCliente = user?.role === 'cliente';
 
   const loadCompany = useCallback(async () => {
     if (!user?.id || user.role !== 'empresa') {
@@ -96,6 +100,20 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleClienteDemo = async () => {
+    setSwitchingCliente(true);
+    setCompanyError(null);
+    try {
+      await loginAsClienteDemo();
+    } catch {
+      setCompanyError(
+        'No se pudo cargar demo@cliente.com. ¿Backend encendido y seed ejecutado?',
+      );
+    } finally {
+      setSwitchingCliente(false);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="flex-1 px-4 pt-4" contentContainerClassName="pb-10">
@@ -120,6 +138,35 @@ export default function ProfileScreen() {
             Modo empresa · {user?.email ?? 'tienda@empresa.com'}
           </Text>
         )}
+
+        {!isCliente ? (
+          <Pressable
+            className="mt-3 items-center rounded-xl border border-[#0F172A] py-3"
+            onPress={() => void handleClienteDemo()}
+            disabled={switchingCliente}
+          >
+            {switchingCliente ? (
+              <ActivityIndicator color="#0F172A" />
+            ) : (
+              <Text className="text-sm font-bold text-[#0F172A]">
+                Actuar como cliente demo (solicitudes)
+              </Text>
+            )}
+          </Pressable>
+        ) : (
+          <Text className="mt-2 text-xs text-[#0F172A]">
+            Modo cliente · {user?.email ?? 'demo@cliente.com'}
+          </Text>
+        )}
+
+        {isCliente ? (
+          <Pressable
+            className="mt-3 items-center rounded-xl bg-[#0F172A] py-3"
+            onPress={() => router.push('/service-requests')}
+          >
+            <Text className="text-sm font-bold text-white">Mis solicitudes de servicio</Text>
+          </Pressable>
+        ) : null}
 
         <View className="mt-6 items-center rounded-2xl border border-[#E2E8F0] bg-white p-6">
           <Avatar

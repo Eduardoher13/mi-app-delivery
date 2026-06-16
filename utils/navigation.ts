@@ -19,3 +19,21 @@ export function goToProfessionalOffer(
     },
   });
 }
+
+export function goToNewServiceRequest(
+  router: Router,
+  params?: {
+    specialtySlug?: string;
+    professionalId?: string;
+    isEmergency?: boolean;
+  },
+): void {
+  router.push({
+    pathname: '/service-request/new',
+    params: {
+      specialtySlug: params?.specialtySlug ?? '',
+      professionalId: params?.professionalId ?? '',
+      isEmergency: params?.isEmergency ? 'true' : '',
+    },
+  });
+}

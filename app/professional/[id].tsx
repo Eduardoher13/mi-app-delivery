@@ -3,6 +3,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { goToNewServiceRequest } from '../../utils/navigation';
+
 export default function ProfessionalOfferScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
@@ -79,12 +81,15 @@ export default function ProfessionalOfferScreen() {
           </Pressable>
 
           <Pressable
-            className="mt-3 items-center rounded-xl border border-[#E2E8F0] py-4"
-            disabled
+            className="mt-3 items-center rounded-xl bg-[#0F172A] py-4"
+            onPress={() =>
+              goToNewServiceRequest(router, {
+                specialtySlug: params.specialtySlug || undefined,
+                professionalId: params.id,
+              })
+            }
           >
-            <Text className="text-sm font-bold text-[#94A3B8]">
-              Solicitar servicio — Fase 4
-            </Text>
+            <Text className="text-sm font-bold text-white">Solicitar servicio</Text>
           </Pressable>
         </View>
       </ScrollView>

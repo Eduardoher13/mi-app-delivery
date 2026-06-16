@@ -24,7 +24,7 @@ import { getActiveProducts } from '../../../services/products';
 import { getAvailableProfessionals } from '../../../services/professionals';
 import { Category, Product, ServiceProvider } from '../../../types';
 import { CATEGORIES, MOCK_USER } from '../../../utils/constants';
-import { goToProfessionalOffer } from '../../../utils/navigation';
+import { goToNewServiceRequest, goToProfessionalOffer } from '../../../utils/navigation';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -160,7 +160,7 @@ export default function HomeScreen() {
           <View className="mb-5 flex-row">
             <QuickActionButton
               label="Solicitar profesional"
-              onPress={() => goToServices()}
+              onPress={() => goToNewServiceRequest(router)}
             />
             <QuickActionButton
               label="Comprar materiales"
@@ -169,7 +169,12 @@ export default function HomeScreen() {
             <QuickActionButton
               label="Emergencia 24/7"
               variant="emergency"
-              onPress={() => goToServices('emergencia')}
+              onPress={() =>
+                goToNewServiceRequest(router, {
+                  specialtySlug: 'emergencia',
+                  isEmergency: true,
+                })
+              }
             />
           </View>
 

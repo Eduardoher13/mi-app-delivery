@@ -28,6 +28,9 @@ export const AUTH_USER_KEY = '@casaia/user';
 /** Usuario empresa del seed del backend (npm run seed en casa-ia-desk) */
 export const DEMO_EMPRESA_EMAIL = 'tienda@empresa.com';
 
+/** Usuario cliente del seed — para POST /service-requests */
+export const DEMO_CLIENTE_EMAIL = 'demo@cliente.com';
+
 /** Supabase Storage — un bucket con carpetas internas */
 export const SUPABASE_STORAGE_BUCKET = 'product_images';
 export const SUPABASE_FOLDER_AVATARS = 'avatars';

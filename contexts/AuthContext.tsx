@@ -13,9 +13,24 @@ import { getUserByEmail } from '../services/users';
 import {
   AUTH_TOKEN_KEY,
   AUTH_USER_KEY,
+  DEMO_CLIENTE_EMAIL,
   DEMO_EMPRESA_EMAIL,
   MOCK_USER,
 } from '../utils/constants';
+
+function userFromApiUser(apiUser: Awaited<ReturnType<typeof getUserByEmail>>): User {
+  return {
+    id: apiUser.id,
+    name: `${apiUser.first_name} ${apiUser.last_name}`.trim(),
+    email: apiUser.email,
+    role: apiUser.role,
+    avatarUrl: apiUser.avatar_url ?? undefined,
+  };
+}
+
+function isLegacyMockUser(user: User): boolean {
+  return user.id === MOCK_USER.id || !user.email;
+}
 
 interface AuthContextValue {
   user: User | null;
@@ -24,6 +39,7 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
   updateAvatarUrl: (avatarUrl: string) => Promise<void>;
   loginAsEmpresaDemo: () => Promise<void>;
+  loginAsClienteDemo: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -63,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function loadSession() {
       try {
         const storedToken = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
-        const storedUser = await loadStoredUser();
+        const storedUserRaw = await AsyncStorage.getItem(AUTH_USER_KEY);
 
         if (storedToken) {
           setToken(storedToken);
@@ -72,7 +88,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setToken(MOCK_TOKEN);
         }
 
+        // Sin sesión guardada o usuario mock legacy (id "123"): cliente demo para Fase 4
+        if (!storedUserRaw) {
+          const apiUser = await getUserByEmail(DEMO_CLIENTE_EMAIL);
+          const demoCliente = userFromApiUser(apiUser);
+          await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(demoCliente));
+          setUser(demoCliente);
+          return;
+        }
+
+        const storedUser = await loadStoredUser();
+        if (isLegacyMockUser(storedUser)) {
+          const apiUser = await getUserByEmail(DEMO_CLIENTE_EMAIL);
+          const demoCliente = userFromApiUser(apiUser);
+          await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(demoCliente));
+          setUser(demoCliente);
+          return;
+        }
+
         setUser(storedUser);
+      } catch {
+        setUser(defaultUser());
       } finally {
         setLoading(false);
       }
@@ -96,13 +132,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginAsEmpresaDemo = useCallback(async () => {
     const apiUser = await getUserByEmail(DEMO_EMPRESA_EMAIL);
-    await persistUser({
-      id: apiUser.id,
-      name: `${apiUser.first_name} ${apiUser.last_name}`.trim(),
-      email: apiUser.email,
-      role: apiUser.role,
-      avatarUrl: apiUser.avatar_url ?? undefined,
-    });
+    await persistUser(userFromApiUser(apiUser));
+  }, [persistUser]);
+
+  const loginAsClienteDemo = useCallback(async () => {
+    const apiUser = await getUserByEmail(DEMO_CLIENTE_EMAIL);
+    await persistUser(userFromApiUser(apiUser));
   }, [persistUser]);
 
   const signOut = useCallback(async () => {
@@ -112,8 +147,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, token, loading, signOut, updateAvatarUrl, loginAsEmpresaDemo }),
-    [user, token, loading, signOut, updateAvatarUrl, loginAsEmpresaDemo],
+    () => ({
+      user,
+      token,
+      loading,
+      signOut,
+      updateAvatarUrl,
+      loginAsEmpresaDemo,
+      loginAsClienteDemo,
+    }),
+    [
+      user,
+      token,
+      loading,
+      signOut,
+      updateAvatarUrl,
+      loginAsEmpresaDemo,
+      loginAsClienteDemo,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
