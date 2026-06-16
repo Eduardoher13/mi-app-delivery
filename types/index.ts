@@ -10,6 +10,7 @@ export interface Category {
   id: string;
   name: string;
   icon: string;
+  slug: string;
 }
 
 export interface Product {
@@ -51,6 +52,24 @@ export interface ServiceProvider {
   rating: number;
   imageUrl: string;
   price: number;
+  specialtySlug?: string;
+}
+
+export interface ApiProfessionalUser {
+  id: string;
+  first_name: string;
+  last_name: string;
+  avatar_url?: string | null;
+}
+
+export interface ApiProfessional {
+  id: string;
+  user_id: string;
+  bio: string;
+  base_price: string;
+  avg_rating: string;
+  is_available: boolean;
+  user: ApiProfessionalUser;
 }
 
 export interface CartItem {

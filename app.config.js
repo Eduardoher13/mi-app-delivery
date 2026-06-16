@@ -1,5 +1,34 @@
 /** @type {import('expo/config').ExpoConfig} */
+const os = require('os');
+
 require('dotenv').config({ path: '.env' });
+
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT?.trim() || '8001';
+
+function getLanIp() {
+  const interfaces = os.networkInterfaces();
+  const prefer = ['en0', 'en1', 'wlan0', 'eth0'];
+
+  for (const name of prefer) {
+    for (const iface of interfaces[name] ?? []) {
+      if (iface.family === 'IPv4' && !iface.internal && !iface.address.startsWith('169.254.')) {
+        return iface.address;
+      }
+    }
+  }
+
+  for (const addrs of Object.values(interfaces)) {
+    for (const iface of addrs ?? []) {
+      if (iface.family === 'IPv4' && !iface.internal && !iface.address.startsWith('169.254.')) {
+        return iface.address;
+      }
+    }
+  }
+
+  return '127.0.0.1';
+}
+
+const autoApiBaseUrl = `http://${getLanIp()}:${API_PORT}`;
 
 module.exports = ({ config }) => ({
   ...config,
@@ -64,7 +93,8 @@ module.exports = ({ config }) => ({
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
     googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
-    apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',
+    apiPort: API_PORT,
+    apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL?.trim() || autoApiBaseUrl,
     router: {},
     eas: {
       projectId: process.env.EAS_PROJECT_ID ?? '',

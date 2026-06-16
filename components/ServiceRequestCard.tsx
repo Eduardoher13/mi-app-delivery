@@ -28,31 +28,35 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function ServiceRequestCard({ service, onPress }: ServiceRequestCardProps) {
+  const handlePress = () => onPress?.(service);
+
   return (
-    <Pressable
-      className="mr-3 w-44 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white"
-      onPress={() => onPress?.(service)}
-    >
-      <Image
-        source={{ uri: service.imageUrl }}
-        className="h-28 w-full"
-        resizeMode="cover"
-      />
-      <View className="p-3">
-        <Text className="text-sm font-bold text-[#0F172A]">{service.name}</Text>
-        <Text className="text-xs text-[#94A3B8]">{service.role}</Text>
-        <View className="my-2">
-          <StarRating rating={service.rating} />
+    <View className="mr-3 w-44 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white">
+      <Pressable onPress={handlePress}>
+        <Image
+          source={{ uri: service.imageUrl }}
+          className="h-28 w-full"
+          resizeMode="cover"
+        />
+        <View className="p-3 pb-2">
+          <Text className="text-sm font-bold text-[#0F172A]">{service.name}</Text>
+          <Text className="text-xs text-[#94A3B8]">{service.role}</Text>
+          <View className="my-2">
+            <StarRating rating={service.rating} />
+          </View>
         </View>
-        <View className="flex-row items-center justify-between">
-          <Text className="text-sm font-bold text-[#00A878]">
-            ${service.price}/hr
-          </Text>
-          <Pressable className="rounded-lg bg-[#00A878] px-3 py-1.5">
-            <Text className="text-xs font-bold text-white">Ver oferta</Text>
-          </Pressable>
-        </View>
+      </Pressable>
+      <View className="flex-row items-center justify-between px-3 pb-3">
+        <Text className="text-sm font-bold text-[#00A878]">
+          ${service.price}/hr
+        </Text>
+        <Pressable
+          className="rounded-lg bg-[#00A878] px-3 py-1.5"
+          onPress={handlePress}
+        >
+          <Text className="text-xs font-bold text-white">Ver oferta</Text>
+        </Pressable>
       </View>
-    </Pressable>
+    </View>
   );
 }

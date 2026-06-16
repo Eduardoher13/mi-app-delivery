@@ -1,41 +1,39 @@
 #!/usr/bin/env bash
-# Verifica que el backend NestJS responda en EXPO_PUBLIC_API_BASE_URL
+# Verifica que el backend NestJS responda (IP detectada automáticamente)
 set -euo pipefail
 
 ENV_FILE="${1:-.env}"
 
-if [ ! -f "$ENV_FILE" ]; then
-  echo "No existe $ENV_FILE"
-  exit 1
+if [ -f "$ENV_FILE" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
 fi
 
-set -a
-# shellcheck disable=SC1090
-source "$ENV_FILE"
-set +a
+PORT="${EXPO_PUBLIC_API_PORT:-8001}"
+MAC_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)
 
-URL="${EXPO_PUBLIC_API_BASE_URL:-}"
+if [ -n "${EXPO_PUBLIC_API_BASE_URL:-}" ]; then
+  URL="$EXPO_PUBLIC_API_BASE_URL"
+  URL_SOURCE="EXPO_PUBLIC_API_BASE_URL (.env)"
+else
+  URL="http://${MAC_IP:-127.0.0.1}:${PORT}"
+  URL_SOURCE="auto (IP WiFi + puerto ${PORT})"
+fi
 
 echo "=== Revisión API backend ==="
-
-if [ -z "$URL" ]; then
-  echo "❌ Falta EXPO_PUBLIC_API_BASE_URL en .env"
-  exit 1
-fi
-
-if [[ "$URL" == *"localhost"* ]] || [[ "$URL" == *"127.0.0.1"* ]]; then
-  echo "⚠️  $URL usa localhost — en celular físico (Honor) NO funcionará."
-  echo "   Usa la IP LAN de tu Mac, ej: http://192.168.1.74:8001"
-fi
-
-echo "URL configurada: $URL"
+echo "URL: $URL"
+echo "Origen: $URL_SOURCE"
 echo ""
 
-MAC_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)
 if [ -n "$MAC_IP" ]; then
   echo "IP WiFi de esta Mac: $MAC_IP"
-  if [[ "$URL" != *"$MAC_IP"* ]]; then
-    echo "⚠️  La URL no contiene $MAC_IP — verifica que sea la IP actual."
+  if [[ "$URL" != *"$MAC_IP"* ]] && [[ -z "${EXPO_PUBLIC_API_BASE_URL:-}" ]]; then
+    echo "⚠️  No se detectó en0/en1 — revisa la conexión WiFi."
+  elif [[ -n "${EXPO_PUBLIC_API_BASE_URL:-}" ]] && [[ "$URL" != *"$MAC_IP"* ]]; then
+    echo "⚠️  Override manual en .env no coincide con IP actual ($MAC_IP)."
+    echo "   Quita EXPO_PUBLIC_API_BASE_URL del .env para usar detección automática."
   fi
   echo ""
 fi
@@ -70,5 +68,6 @@ else
 fi
 
 echo ""
-echo "En el Honor abre Chrome y prueba: $URL/"
-echo "Luego reinicia Expo: npx expo start --clear"
+echo "La app en Expo Go usa la misma IP que Metro (no hace falta poner IP en .env)."
+echo "Solo define EXPO_PUBLIC_API_PORT si el backend no usa 8001."
+echo "Reinicia Metro tras cambiar de red: npx expo start --clear"

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -19,13 +20,22 @@ import { Product } from '../../../types';
 const SEARCH_DEBOUNCE_MS = 400;
 
 export default function ProductsScreen() {
+  const { q } = useLocalSearchParams<{ q?: string }>();
+  const initialQuery = typeof q === 'string' ? q : '';
   const apiStatus = getApiStatus();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+
+  useEffect(() => {
+    if (initialQuery) {
+      setSearchQuery(initialQuery);
+      setDebouncedQuery(initialQuery);
+    }
+  }, [initialQuery]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

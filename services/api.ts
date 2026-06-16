@@ -1,33 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import Constants from 'expo-constants';
 
+import { getApiStatus, resolveApiBaseUrl } from '../utils/apiBaseUrl';
 import { AUTH_TOKEN_KEY } from '../utils/constants';
 
-export function resolveApiBaseUrl(): string {
-  const url = (
-    Constants.expoConfig?.extra?.apiBaseUrl ??
-    process.env.EXPO_PUBLIC_API_BASE_URL ??
-    ''
-  ).trim();
-
-  if (url && !url.includes('localhost') && !url.includes('127.0.0.1')) {
-    return url.replace(/\/$/, '');
-  }
-
-  return url.replace(/\/$/, '') || 'http://localhost:8001';
-}
-
-export function getApiStatus() {
-  const baseURL = resolveApiBaseUrl();
-  const fromExtra = Boolean(Constants.expoConfig?.extra?.apiBaseUrl);
-
-  return {
-    baseURL,
-    source: fromExtra ? 'app.config extra' : 'process.env',
-    isLocalhost: baseURL.includes('localhost') || baseURL.includes('127.0.0.1'),
-  };
-}
+export { getApiStatus, resolveApiBaseUrl };
 
 export const api: AxiosInstance = axios.create({
   timeout: 15000,
