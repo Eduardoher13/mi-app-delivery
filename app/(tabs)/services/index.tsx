@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -9,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ServiceRequestCard } from '../../../components/ServiceRequestCard';
+import { ProfessionalListCard } from '../../../components/ProfessionalListCard';
 import { formatApiError } from '../../../services/api';
 import {
   getAvailableProfessionals,
@@ -22,7 +23,8 @@ import { goToProfessionalOffer } from '../../../utils/navigation';
 export default function ServicesScreen() {
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug?: string }>();
-  const specialtySlug = typeof slug === 'string' ? slug : undefined;
+  const specialtySlug =
+    typeof slug === 'string' && slug.length > 0 ? slug : undefined;
 
   const categoryName = useMemo(() => {
     if (!specialtySlug) {
@@ -65,21 +67,70 @@ export default function ServicesScreen() {
     void loadProfessionals();
   }, [loadProfessionals]);
 
-  const title = categoryName
-    ? `Servicios — ${categoryName}`
-    : 'Servicios';
+  const handleSelectSlug = (nextSlug?: string) => {
+    router.setParams({ slug: nextSlug ?? '' });
+  };
+
+  const title = categoryName ? `Servicios — ${categoryName}` : 'Servicios';
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <View className="flex-1 px-4 pt-4">
         <Text className="text-2xl font-black text-[#0F172A]">{title}</Text>
         <Text className="mt-1 text-sm text-[#94A3B8]">
-          {specialtySlug
-            ? `Profesionales de ${categoryName ?? specialtySlug}`
-            : 'Profesionales disponibles cerca de ti'}
+          {!loading && !error
+            ? `${professionals.length} profesional(es)`
+            : specialtySlug
+              ? `Profesionales de ${categoryName ?? specialtySlug}`
+              : 'Profesionales disponibles cerca de ti'}
         </Text>
 
-        {/* Fase 3: filtros, detalle, solicitar servicio */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mt-4 max-h-9 flex-grow-0"
+          contentContainerClassName="items-center pr-2"
+        >
+          <Pressable
+            className={`mr-2 rounded-full border px-3 py-1 ${
+              !specialtySlug
+                ? 'border-[#00A878] bg-[#00A878]'
+                : 'border-[#E2E8F0] bg-white'
+            }`}
+            onPress={() => handleSelectSlug()}
+          >
+            <Text
+              className={`text-[11px] font-bold leading-4 ${
+                !specialtySlug ? 'text-white' : 'text-[#0F172A]'
+              }`}
+            >
+              Todos
+            </Text>
+          </Pressable>
+          {CATEGORIES.map((category) => {
+            const selected = specialtySlug === category.slug;
+
+            return (
+              <Pressable
+                key={category.id}
+                className={`mr-2 rounded-full border px-3 py-1 ${
+                  selected
+                    ? 'border-[#00A878] bg-[#00A878]'
+                    : 'border-[#E2E8F0] bg-white'
+                }`}
+                onPress={() => handleSelectSlug(category.slug)}
+              >
+                <Text
+                  className={`text-[11px] font-bold leading-4 ${
+                    selected ? 'text-white' : 'text-[#0F172A]'
+                  }`}
+                >
+                  {category.name}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
 
         {loading ? (
           <View className="flex-1 items-center justify-center">
@@ -111,7 +162,7 @@ export default function ServicesScreen() {
           >
             {professionals.map((professional) => (
               <View key={professional.id} className="mb-3">
-                <ServiceRequestCard
+                <ProfessionalListCard
                   service={professional}
                   onPress={(item) => goToProfessionalOffer(router, item)}
                 />

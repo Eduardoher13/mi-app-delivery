@@ -55,6 +55,14 @@ export interface ServiceProvider {
   specialtySlug?: string;
 }
 
+export interface ServiceProviderDetail extends ServiceProvider {
+  bio: string;
+  yearsExperience: number;
+  totalReviews: number;
+  serviceRadiusKm: number;
+  isAvailable: boolean;
+}
+
 export interface ApiProfessionalUser {
   id: string;
   first_name: string;
@@ -65,10 +73,13 @@ export interface ApiProfessionalUser {
 export interface ApiProfessional {
   id: string;
   user_id: string;
-  bio: string;
+  bio?: string | null;
+  years_experience?: number;
   base_price: string;
   avg_rating: string;
+  total_reviews?: number;
   is_available: boolean;
+  service_radius_km?: string;
   user: ApiProfessionalUser;
 }
 
