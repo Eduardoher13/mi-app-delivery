@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router, type Href } from 'expo-router';
 import React, {
   createContext,
   useCallback,
@@ -8,65 +9,53 @@ import React, {
   useState,
 } from 'react';
 
+import {
+  getMe,
+  login as apiLogin,
+  mapAuthUserToUser,
+} from '../services/auth';
 import { User } from '../types';
-import { getUserByEmail } from '../services/users';
 import {
   AUTH_TOKEN_KEY,
   AUTH_USER_KEY,
   DEMO_CLIENTE_EMAIL,
   DEMO_EMPRESA_EMAIL,
-  MOCK_USER,
+  DEMO_PASSWORD,
+  DEMO_PROFESIONAL_EMAIL,
 } from '../utils/constants';
-
-function userFromApiUser(apiUser: Awaited<ReturnType<typeof getUserByEmail>>): User {
-  return {
-    id: apiUser.id,
-    name: `${apiUser.first_name} ${apiUser.last_name}`.trim(),
-    email: apiUser.email,
-    role: apiUser.role,
-    avatarUrl: apiUser.avatar_url ?? undefined,
-  };
-}
-
-function isLegacyMockUser(user: User): boolean {
-  return user.id === MOCK_USER.id || !user.email;
-}
 
 interface AuthContextValue {
   user: User | null;
   token: string | null;
   loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateAvatarUrl: (avatarUrl: string) => Promise<void>;
-  loginAsEmpresaDemo: () => Promise<void>;
   loginAsClienteDemo: () => Promise<void>;
+  loginAsEmpresaDemo: () => Promise<void>;
+  loginAsProfesionalDemo: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const MOCK_TOKEN = 'mock-jwt-token-casaia';
+const LEGACY_MOCK_TOKEN = 'mock-jwt-token-casaia';
 
-function defaultUser(): User {
-  return { id: MOCK_USER.id, name: MOCK_USER.name };
-}
-
-async function loadStoredUser(): Promise<User> {
-  const raw = await AsyncStorage.getItem(AUTH_USER_KEY);
-  if (!raw) {
-    return defaultUser();
-  }
-
+function parseStoredUser(raw: string): User | null {
   try {
     const parsed = JSON.parse(raw) as User;
+    if (!parsed.id || !parsed.email) {
+      return null;
+    }
+
     return {
-      id: parsed.id ?? MOCK_USER.id,
-      name: parsed.name ?? MOCK_USER.name,
+      id: parsed.id,
+      name: parsed.name,
       email: parsed.email,
       role: parsed.role,
       avatarUrl: parsed.avatarUrl,
     };
   } catch {
-    return defaultUser();
+    return null;
   }
 }
 
@@ -75,95 +64,119 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const persistSession = useCallback(async (nextUser: User, nextToken: string) => {
+    setUser(nextUser);
+    setToken(nextToken);
+    await AsyncStorage.setItem(AUTH_TOKEN_KEY, nextToken);
+    await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextUser));
+  }, []);
+
+  const clearSession = useCallback(async () => {
+    setUser(null);
+    setToken(null);
+    await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, AUTH_USER_KEY]);
+  }, []);
+
   useEffect(() => {
     async function loadSession() {
       try {
         const storedToken = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+
+        if (!storedToken || storedToken === LEGACY_MOCK_TOKEN) {
+          if (storedToken === LEGACY_MOCK_TOKEN) {
+            await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, AUTH_USER_KEY]);
+          }
+          return;
+        }
+
+        setToken(storedToken);
+
         const storedUserRaw = await AsyncStorage.getItem(AUTH_USER_KEY);
-
-        if (storedToken) {
-          setToken(storedToken);
-        } else {
-          await AsyncStorage.setItem(AUTH_TOKEN_KEY, MOCK_TOKEN);
-          setToken(MOCK_TOKEN);
+        if (storedUserRaw) {
+          const storedUser = parseStoredUser(storedUserRaw);
+          if (storedUser) {
+            setUser(storedUser);
+          }
         }
 
-        // Sin sesión guardada o usuario mock legacy (id "123"): cliente demo para Fase 4
-        if (!storedUserRaw) {
-          const apiUser = await getUserByEmail(DEMO_CLIENTE_EMAIL);
-          const demoCliente = userFromApiUser(apiUser);
-          await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(demoCliente));
-          setUser(demoCliente);
-          return;
-        }
-
-        const storedUser = await loadStoredUser();
-        if (isLegacyMockUser(storedUser)) {
-          const apiUser = await getUserByEmail(DEMO_CLIENTE_EMAIL);
-          const demoCliente = userFromApiUser(apiUser);
-          await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(demoCliente));
-          setUser(demoCliente);
-          return;
-        }
-
-        setUser(storedUser);
+        const me = await getMe();
+        const refreshedUser = mapAuthUserToUser(me);
+        setUser(refreshedUser);
+        await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(refreshedUser));
       } catch {
-        setUser(defaultUser());
+        await clearSession();
       } finally {
         setLoading(false);
       }
     }
 
     void loadSession();
-  }, []);
+  }, [clearSession]);
 
-  const persistUser = useCallback(async (nextUser: User) => {
-    setUser(nextUser);
-    await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextUser));
-  }, []);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const response = await apiLogin(email.trim(), password);
+      const nextUser = mapAuthUserToUser(response.user);
+      await persistSession(nextUser, response.access_token);
+    },
+    [persistSession],
+  );
+
+  const loginAsClienteDemo = useCallback(
+    () => login(DEMO_CLIENTE_EMAIL, DEMO_PASSWORD),
+    [login],
+  );
+
+  const loginAsEmpresaDemo = useCallback(
+    () => login(DEMO_EMPRESA_EMAIL, DEMO_PASSWORD),
+    [login],
+  );
+
+  const loginAsProfesionalDemo = useCallback(
+    () => login(DEMO_PROFESIONAL_EMAIL, DEMO_PASSWORD),
+    [login],
+  );
+
+  const signOut = useCallback(async () => {
+    await clearSession();
+    router.replace('/login' as Href);
+  }, [clearSession]);
 
   const updateAvatarUrl = useCallback(
     async (avatarUrl: string) => {
-      const base = user ?? defaultUser();
-      await persistUser({ ...base, avatarUrl });
+      if (!user) {
+        return;
+      }
+
+      const nextUser = { ...user, avatarUrl };
+      setUser(nextUser);
+      await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextUser));
     },
-    [persistUser, user],
+    [user],
   );
-
-  const loginAsEmpresaDemo = useCallback(async () => {
-    const apiUser = await getUserByEmail(DEMO_EMPRESA_EMAIL);
-    await persistUser(userFromApiUser(apiUser));
-  }, [persistUser]);
-
-  const loginAsClienteDemo = useCallback(async () => {
-    const apiUser = await getUserByEmail(DEMO_CLIENTE_EMAIL);
-    await persistUser(userFromApiUser(apiUser));
-  }, [persistUser]);
-
-  const signOut = useCallback(async () => {
-    await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, AUTH_USER_KEY]);
-    setToken(null);
-    setUser(null);
-  }, []);
 
   const value = useMemo(
     () => ({
       user,
       token,
       loading,
+      login,
       signOut,
       updateAvatarUrl,
-      loginAsEmpresaDemo,
       loginAsClienteDemo,
+      loginAsEmpresaDemo,
+      loginAsProfesionalDemo,
     }),
     [
       user,
       token,
       loading,
+      login,
       signOut,
       updateAvatarUrl,
-      loginAsEmpresaDemo,
       loginAsClienteDemo,
+      loginAsEmpresaDemo,
+      loginAsProfesionalDemo,
     ],
   );
 

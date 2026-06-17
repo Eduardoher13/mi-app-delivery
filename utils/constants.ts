@@ -31,6 +31,12 @@ export const DEMO_EMPRESA_EMAIL = 'tienda@empresa.com';
 /** Usuario cliente del seed — para POST /service-requests */
 export const DEMO_CLIENTE_EMAIL = 'demo@cliente.com';
 
+/** Profesional demo del seed */
+export const DEMO_PROFESIONAL_EMAIL = 'carlos.fontaneria@demo.com';
+
+/** Contraseña común de usuarios demo (npm run seed:reset en casa-ia-desk) */
+export const DEMO_PASSWORD = 'demo123';
+
 /** Supabase Storage — un bucket con carpetas internas */
 export const SUPABASE_STORAGE_BUCKET = 'product_images';
 export const SUPABASE_FOLDER_AVATARS = 'avatars';

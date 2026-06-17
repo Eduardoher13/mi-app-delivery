@@ -18,7 +18,7 @@ api.interceptors.request.use(
     config.baseURL = resolveApiBaseUrl();
 
     const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
-    if (token) {
+    if (token && token !== 'mock-jwt-token-casaia') {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
