@@ -96,7 +96,15 @@ export async function getServiceRequestsForProfessional(
     return [];
   }
 
-  const specialtySet = new Set(specialtyIds);
+  const specialtySet = new Set(specialtyIds.map((id) => Number(id)));
   const all = await getServiceRequests({ limit: options?.limit ?? 50 });
-  return all.filter((request) => specialtySet.has(request.specialty_id));
+  return all.filter((request) => specialtySet.has(Number(request.specialty_id)));
+}
+
+export async function updateServiceRequest(
+  id: string,
+  dto: { status?: string },
+): Promise<ServiceRequest> {
+  const { data } = await api.patch<ServiceRequest>(`/service-requests/${id}`, dto);
+  return data;
 }

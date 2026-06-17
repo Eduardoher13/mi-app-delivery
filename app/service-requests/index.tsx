@@ -21,6 +21,7 @@ import {
 } from '../../services/serviceRequests';
 import { goToNewServiceRequest } from '../../utils/navigation';
 import { isCliente } from '../../utils/roles';
+import { serviceRequestStatusLabel } from '../../utils/serviceRequestStatus';
 
 function formatDate(iso: string): string {
   const date = new Date(iso);
@@ -36,14 +37,7 @@ function formatDate(iso: string): string {
 }
 
 function statusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    pendiente: 'Pendiente',
-    en_proceso: 'En proceso',
-    completado: 'Completado',
-    cancelado: 'Cancelado',
-  };
-
-  return labels[status] ?? status;
+  return serviceRequestStatusLabel(status);
 }
 
 export default function ServiceRequestsScreen() {
@@ -138,9 +132,15 @@ export default function ServiceRequestsScreen() {
             }
           >
             {requests.map((request) => (
-              <View
+              <Pressable
                 key={request.id}
                 className="mb-3 rounded-xl border border-[#E2E8F0] bg-white p-4"
+                onPress={() =>
+                  router.push({
+                    pathname: '/service-request/[id]',
+                    params: { id: request.id },
+                  })
+                }
               >
                 <View className="flex-row items-start justify-between">
                   <Text className="flex-1 pr-2 text-sm font-bold text-[#0F172A]">
@@ -163,7 +163,7 @@ export default function ServiceRequestsScreen() {
                     {formatDate(request.created_at)}
                   </Text>
                 </View>
-              </View>
+              </Pressable>
             ))}
           </ScrollView>
         )}

@@ -17,6 +17,7 @@ import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { useLocation } from '../../hooks/useLocation';
 import { formatApiError } from '../../services/api';
 import { getSpecialtyBySlug } from '../../services/specialties';
+import { getPrimarySpecialtySlugByProfessional } from '../../services/professionalSpecialties';
 import {
   createServiceRequest,
   resolveClientId,
@@ -46,16 +47,18 @@ export default function NewServiceRequestScreen() {
   const params = useLocalSearchParams<{
     specialtySlug?: string;
     professionalId?: string;
+    professionalName?: string;
     isEmergency?: string;
   }>();
 
   const initialSlug = parseStringParam(params.specialtySlug);
   const professionalId = parseStringParam(params.professionalId);
+  const professionalName = parseStringParam(params.professionalName);
   const initialEmergency = parseBoolParam(params.isEmergency);
 
   const { coords, requestPermission } = useLocation();
 
-  const [selectedSlug, setSelectedSlug] = useState(initialSlug || CATEGORIES[0]?.slug || '');
+  const [selectedSlug, setSelectedSlug] = useState(initialSlug || '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
@@ -69,10 +72,37 @@ export default function NewServiceRequestScreen() {
   useRoleRedirect(isCliente);
 
   useEffect(() => {
-    if (initialSlug) {
+    if (initialSlug && !professionalId) {
       setSelectedSlug(initialSlug);
     }
-  }, [initialSlug]);
+  }, [initialSlug, professionalId]);
+
+  useEffect(() => {
+    if (!professionalId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadProfessionalCategory() {
+      try {
+        const slug = await getPrimarySpecialtySlugByProfessional(professionalId);
+        if (!cancelled && slug) {
+          setSelectedSlug(slug);
+        }
+      } catch {
+        if (!cancelled && initialSlug) {
+          setSelectedSlug(initialSlug);
+        }
+      }
+    }
+
+    void loadProfessionalCategory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [professionalId, initialSlug]);
 
   useEffect(() => {
     setIsEmergency(initialEmergency);
@@ -197,9 +227,16 @@ export default function NewServiceRequestScreen() {
         </View>
 
         {professionalId ? (
-          <Text className="mt-3 text-xs text-[#94A3B8]">
-            Referencia profesional: {professionalId.slice(0, 8)}…
-          </Text>
+          <View className="mt-3 rounded-xl bg-[#F8FAFC] px-3 py-2">
+            <Text className="text-xs font-semibold text-[#0F172A]">
+              {professionalName
+                ? `Profesional: ${professionalName}`
+                : `Profesional: ${professionalId.slice(0, 8)}…`}
+            </Text>
+            <Text className="mt-1 text-[10px] text-[#94A3B8]">
+              La categoría se asigna según su especialidad
+            </Text>
+          </View>
         ) : null}
 
         <Text className="mb-2 mt-6 text-xs font-semibold tracking-widest text-[#94A3B8]">
@@ -208,6 +245,7 @@ export default function NewServiceRequestScreen() {
         <View className="flex-row flex-wrap">
           {CATEGORIES.map((category) => {
             const selected = selectedSlug === category.slug;
+            const locked = Boolean(professionalId);
 
             return (
               <Pressable
@@ -215,9 +253,16 @@ export default function NewServiceRequestScreen() {
                 className={`mb-2 mr-2 rounded-full border px-4 py-2 ${
                   selected
                     ? 'border-[#00A878] bg-[#00A878]'
-                    : 'border-[#E2E8F0] bg-white'
+                    : locked
+                      ? 'border-[#E2E8F0] bg-[#F8FAFC] opacity-50'
+                      : 'border-[#E2E8F0] bg-white'
                 }`}
-                onPress={() => setSelectedSlug(category.slug)}
+                onPress={() => {
+                  if (!locked) {
+                    setSelectedSlug(category.slug);
+                  }
+                }}
+                disabled={locked && !selected}
               >
                 <Text
                   className={`text-xs font-bold ${

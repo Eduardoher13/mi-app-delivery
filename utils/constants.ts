@@ -41,3 +41,9 @@ export const DEMO_PASSWORD = 'demo123';
 export const SUPABASE_STORAGE_BUCKET = 'product_images';
 export const SUPABASE_FOLDER_AVATARS = 'avatars';
 export const SUPABASE_FOLDER_PRODUCTS = 'image-product';
+
+/** @deprecated Los IDs de API (ej. 20) no coinciden con category.id local ('2'). Usa getSpecialtyNameById en services/specialties.ts */
+export function getSpecialtyNameById(specialtyId: number): string {
+  const category = CATEGORIES.find((item) => item.id === String(specialtyId));
+  return category?.name ?? `Especialidad #${specialtyId}`;
+}

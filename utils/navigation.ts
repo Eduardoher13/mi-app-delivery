@@ -25,6 +25,7 @@ export function goToNewServiceRequest(
   params?: {
     specialtySlug?: string;
     professionalId?: string;
+    professionalName?: string;
     isEmergency?: boolean;
   },
 ): void {
@@ -33,6 +34,7 @@ export function goToNewServiceRequest(
     params: {
       specialtySlug: params?.specialtySlug ?? '',
       professionalId: params?.professionalId ?? '',
+      professionalName: params?.professionalName ?? '',
       isEmergency: params?.isEmergency ? 'true' : '',
     },
   });

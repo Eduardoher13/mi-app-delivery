@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 
 import { ServiceRequest } from '../services/serviceRequests';
+import { serviceRequestStatusLabel } from '../utils/serviceRequestStatus';
 
 interface ServiceRequestInboxCardProps {
   request: ServiceRequest;
@@ -9,14 +10,7 @@ interface ServiceRequestInboxCardProps {
 }
 
 function statusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    pendiente: 'Pendiente',
-    en_proceso: 'En proceso',
-    completado: 'Completado',
-    cancelado: 'Cancelado',
-  };
-
-  return labels[status] ?? status;
+  return serviceRequestStatusLabel(status);
 }
 
 function formatDate(iso: string): string {

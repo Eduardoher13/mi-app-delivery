@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatApiError } from '../../services/api';
 import { useRoleRedirect } from '../../hooks/useRoleRedirect';
+import { getPrimarySpecialtySlugByProfessional } from '../../services/professionalSpecialties';
 import { getProfessionalById } from '../../services/professionals';
 import { ServiceProviderDetail } from '../../types';
 import { goToNewServiceRequest } from '../../utils/navigation';
@@ -43,6 +44,7 @@ export default function ProfessionalOfferScreen() {
   const paramSpecialtySlug = parseStringParam(params.specialtySlug) || undefined;
 
   const [detail, setDetail] = useState<ServiceProviderDetail | null>(null);
+  const [resolvedSlug, setResolvedSlug] = useState<string | undefined>(paramSpecialtySlug);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -57,7 +59,16 @@ export default function ProfessionalOfferScreen() {
       setFetchError(null);
 
       try {
-        const data = await getProfessionalById(professionalId, paramSpecialtySlug);
+        const slugFromApi =
+          paramSpecialtySlug ??
+          (await getPrimarySpecialtySlugByProfessional(professionalId)) ??
+          undefined;
+
+        if (slugFromApi) {
+          setResolvedSlug(slugFromApi);
+        }
+
+        const data = await getProfessionalById(professionalId, slugFromApi);
         setDetail(data);
       } catch (err) {
         setFetchError(formatApiError(err));
@@ -78,22 +89,11 @@ export default function ProfessionalOfferScreen() {
     detail?.imageUrl ??
     params.imageUrl ??
     `https://picsum.photos/seed/pro-${professionalId}/400/400`;
-  const specialtySlug = detail?.specialtySlug ?? paramSpecialtySlug;
+  const specialtySlug = detail?.specialtySlug ?? resolvedSlug ?? paramSpecialtySlug;
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <ScrollView className="flex-1" contentContainerClassName="pb-10">
-        <View className="flex-row items-center px-4 pt-2">
-          <Pressable
-            className="mr-3 h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0]"
-            onPress={() => router.back()}
-            hitSlop={8}
-          >
-            <Ionicons name="arrow-back" size={20} color="#0F172A" />
-          </Pressable>
-          <Text className="text-lg font-black text-[#0F172A]">Oferta del profesional</Text>
-        </View>
-
+      <ScrollView className="flex-1" contentContainerClassName="pb-28">
         {loading ? (
           <View className="my-10 items-center justify-center">
             <ActivityIndicator color="#00A878" size="large" />
@@ -102,7 +102,7 @@ export default function ProfessionalOfferScreen() {
 
         <Image
           source={{ uri: imageUrl }}
-          className="mt-4 h-56 w-full"
+          className="h-56 w-full"
           resizeMode="cover"
         />
 
@@ -174,39 +174,30 @@ export default function ProfessionalOfferScreen() {
 
           <View className="mt-6 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
             <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
-              TARIFA
+              TARIFA ESTIMADA
             </Text>
             <Text className="mt-1 text-3xl font-black text-[#00A878]">
               ${Number.isFinite(price) ? price.toFixed(2) : '—'}
               <Text className="text-base font-bold text-[#94A3B8]"> / hr</Text>
             </Text>
           </View>
-
-          <Pressable
-            className="mt-6 items-center rounded-xl bg-[#00A878] py-4"
-            onPress={() => {
-              router.push({
-                pathname: '/(tabs)/services',
-                params: specialtySlug ? { slug: specialtySlug } : { slug: '' },
-              });
-            }}
-          >
-            <Text className="text-sm font-bold text-white">Ver más profesionales</Text>
-          </Pressable>
-
-          <Pressable
-            className="mt-3 items-center rounded-xl bg-[#0F172A] py-4"
-            onPress={() =>
-              goToNewServiceRequest(router, {
-                specialtySlug,
-                professionalId,
-              })
-            }
-          >
-            <Text className="text-sm font-bold text-white">Solicitar servicio</Text>
-          </Pressable>
         </View>
       </ScrollView>
+
+      <View className="absolute bottom-0 left-0 right-0 border-t border-[#E2E8F0] bg-white px-4 pb-8 pt-4">
+        <Pressable
+          className="items-center rounded-xl bg-[#00A878] py-4 shadow-sm"
+          onPress={() =>
+            goToNewServiceRequest(router, {
+              specialtySlug,
+              professionalId,
+              professionalName: name,
+            })
+          }
+        >
+          <Text className="text-base font-bold text-white">Solicitar servicio</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }
