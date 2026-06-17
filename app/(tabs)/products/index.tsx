@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -13,6 +13,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProductCard } from '../../../components/ProductCard';
+import { FloatingCart } from '../../../components/FloatingCart';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useCart } from '../../../contexts/CartContext';
 import { useRoleRedirect } from '../../../hooks/useRoleRedirect';
 import { formatApiError, getApiStatus } from '../../../services/api';
 import { getProducts } from '../../../services/products';
@@ -22,7 +25,11 @@ import { isCliente } from '../../../utils/roles';
 const SEARCH_DEBOUNCE_MS = 400;
 
 export default function ProductsScreen() {
+  const router = useRouter();
   useRoleRedirect(isCliente);
+  const { user } = useAuth();
+  const { addItem, itemCount, subtotal } = useCart();
+  const [addedMessage, setAddedMessage] = useState<string | null>(null);
   const { q } = useLocalSearchParams<{ q?: string }>();
   const initialQuery = typeof q === 'string' ? q : '';
   const apiStatus = getApiStatus();
@@ -74,6 +81,14 @@ export default function ProductsScreen() {
     void loadProducts();
   }, [loadProducts]);
 
+  const handleAddToCart = (product: Product) => {
+    addItem(product);
+    setAddedMessage(`${product.name} agregado al carrito`);
+    setTimeout(() => setAddedMessage(null), 2000);
+  };
+
+  const showCart = isCliente(user?.role) && itemCount > 0;
+
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <View className="flex-1 px-4 pt-4">
@@ -110,6 +125,14 @@ export default function ProductsScreen() {
           ) : null}
         </View>
 
+        {addedMessage ? (
+          <View className="mt-2 rounded-lg bg-[#00A878]/10 px-3 py-2">
+            <Text className="text-center text-xs font-semibold text-[#00A878]">
+              {addedMessage}
+            </Text>
+          </View>
+        ) : null}
+
         {loading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator color="#00A878" size="large" />
@@ -129,7 +152,7 @@ export default function ProductsScreen() {
         ) : (
           <ScrollView
             className="mt-4 flex-1"
-            contentContainerClassName="pb-8"
+            contentContainerClassName={showCart ? 'pb-36' : 'pb-8'}
             keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl
@@ -142,13 +165,25 @@ export default function ProductsScreen() {
             <View className="flex-row flex-wrap">
               {products.map((product) => (
                 <View key={product.id} className="mb-3 w-1/2 pr-2">
-                  <ProductCard product={product} />
+                  <ProductCard
+                    product={product}
+                    showAddButton
+                    onAddToCart={handleAddToCart}
+                  />
                 </View>
               ))}
             </View>
           </ScrollView>
         )}
       </View>
+
+      {showCart ? (
+        <FloatingCart
+          itemCount={itemCount}
+          total={subtotal}
+          onPress={() => router.push('/cart')}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

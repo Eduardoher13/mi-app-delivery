@@ -62,7 +62,7 @@ export default function EmpresaOrdersScreen() {
         <Text className="mt-1 text-sm text-[#94A3B8]">
           {!loading && !error
             ? `${orders.length} pedido(s) con productos de tu ferretería`
-            : 'Vista previa — carrito completo en Fase 5'}
+            : 'Pedidos de clientes con productos de tu catálogo'}
         </Text>
 
         {loading ? (
@@ -76,7 +76,7 @@ export default function EmpresaOrdersScreen() {
         ) : orders.length === 0 ? (
           <View className="flex-1 items-center justify-center px-4">
             <Text className="text-center text-sm text-[#94A3B8]">
-              Cuando un cliente compre productos de tu ferretería, aparecerán aquí (Fase 5)
+              Cuando un cliente compre productos de tu ferretería, aparecerán aquí.
             </Text>
           </View>
         ) : (

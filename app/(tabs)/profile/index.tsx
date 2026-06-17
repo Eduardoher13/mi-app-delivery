@@ -96,12 +96,20 @@ export default function ProfileScreen() {
         </View>
 
         {showCliente ? (
-          <Pressable
-            className="mt-4 items-center rounded-xl bg-[#0F172A] py-3"
-            onPress={() => router.push('/service-requests')}
-          >
-            <Text className="text-sm font-bold text-white">Mis solicitudes de servicio</Text>
-          </Pressable>
+          <>
+            <Pressable
+              className="mt-4 items-center rounded-xl bg-[#0F172A] py-3"
+              onPress={() => router.push('/service-requests')}
+            >
+              <Text className="text-sm font-bold text-white">Mis solicitudes de servicio</Text>
+            </Pressable>
+            <Pressable
+              className="mt-3 items-center rounded-xl border border-[#0F172A] py-3"
+              onPress={() => router.push('/orders')}
+            >
+              <Text className="text-sm font-bold text-[#0F172A]">Mis pedidos</Text>
+            </Pressable>
+          </>
         ) : null}
 
         {showEmpresa && company ? <CompanyCatalog company={company} /> : null}

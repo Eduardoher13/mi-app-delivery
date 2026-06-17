@@ -16,9 +16,11 @@ import { BannerPromo } from '../../../components/BannerPromo';
 import { Avatar } from '../../../components/Avatar';
 import { CategoryGrid } from '../../../components/CategoryGrid';
 import { ProductCard } from '../../../components/ProductCard';
+import { FloatingCart } from '../../../components/FloatingCart';
 import { QuickActionButton } from '../../../components/QuickActionButton';
 import { ServiceRequestCard } from '../../../components/ServiceRequestCard';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useCart } from '../../../contexts/CartContext';
 import { useRoleRedirect } from '../../../hooks/useRoleRedirect';
 import { formatApiError } from '../../../services/api';
 import { getActiveProducts } from '../../../services/products';
@@ -31,6 +33,7 @@ import { isCliente } from '../../../utils/roles';
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { addItem, itemCount, subtotal } = useCart();
   useRoleRedirect(isCliente);
   const [searchQuery, setSearchQuery] = useState('');
   const [featuredServices, setFeaturedServices] = useState<ServiceProvider[]>([]);
@@ -38,6 +41,12 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const showCart = isCliente(user?.role) && itemCount > 0;
+
+  const handleAddToCart = (product: Product) => {
+    addItem(product);
+  };
 
   const goToServices = useCallback(
     (slug?: string) => {
@@ -103,7 +112,7 @@ export default function HomeScreen() {
       <View className="flex-1">
         <ScrollView
           className="flex-1"
-          contentContainerClassName="pb-8 px-4"
+          contentContainerClassName={showCart ? 'pb-36 px-4' : 'pb-8 px-4'}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -237,6 +246,8 @@ export default function HomeScreen() {
                     <View key={product.id} className="mb-3 w-1/2 pr-2">
                       <ProductCard
                         product={product}
+                        showAddButton
+                        onAddToCart={handleAddToCart}
                         onPress={() => goToProducts(product.name)}
                       />
                     </View>
@@ -247,6 +258,14 @@ export default function HomeScreen() {
           )}
         </ScrollView>
       </View>
+
+      {showCart ? (
+        <FloatingCart
+          itemCount={itemCount}
+          total={subtotal}
+          onPress={() => router.push('/cart')}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

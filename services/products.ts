@@ -52,6 +52,7 @@ export function mapApiProduct(product: ApiProduct): Product {
     price: Number.parseFloat(product.price),
     imageUrl: product.image_url ?? FALLBACK_PRODUCT_IMAGE,
     category: product.company?.commercial_name ?? 'Ferretería',
+    stock: product.stock,
   };
 }
 
