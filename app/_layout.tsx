@@ -18,6 +18,7 @@ export default function RootLayout() {
           <Stack.Screen name="professional/[id]" />
           <Stack.Screen name="service-request/new" />
           <Stack.Screen name="service-requests/index" />
+          <Stack.Screen name="pro-request/[id]" />
         </Stack>
       </AuthProvider>
     </GestureHandlerRootView>

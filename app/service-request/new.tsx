@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../../contexts/AuthContext';
+import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { useLocation } from '../../hooks/useLocation';
 import { formatApiError } from '../../services/api';
 import { getSpecialtyBySlug } from '../../services/specialties';
@@ -21,6 +22,7 @@ import {
   resolveClientId,
 } from '../../services/serviceRequests';
 import { CATEGORIES } from '../../utils/constants';
+import { isCliente } from '../../utils/roles';
 
 function parseBoolParam(value: string | string[] | undefined): boolean {
   if (Array.isArray(value)) {
@@ -63,6 +65,8 @@ export default function NewServiceRequestScreen() {
   const [error, setError] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  useRoleRedirect(isCliente);
 
   useEffect(() => {
     if (initialSlug) {

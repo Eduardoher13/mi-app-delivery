@@ -28,7 +28,7 @@ interface AuthContextValue {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   signOut: () => Promise<void>;
   updateAvatarUrl: (avatarUrl: string) => Promise<void>;
   loginAsClienteDemo: () => Promise<void>;
@@ -114,28 +114,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearSession]);
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string): Promise<User> => {
       const response = await apiLogin(email.trim(), password);
       const nextUser = mapAuthUserToUser(response.user);
       await persistSession(nextUser, response.access_token);
+      return nextUser;
     },
     [persistSession],
   );
 
-  const loginAsClienteDemo = useCallback(
-    () => login(DEMO_CLIENTE_EMAIL, DEMO_PASSWORD),
-    [login],
-  );
+  const loginAsClienteDemo = useCallback(async (): Promise<void> => {
+    await login(DEMO_CLIENTE_EMAIL, DEMO_PASSWORD);
+  }, [login]);
 
-  const loginAsEmpresaDemo = useCallback(
-    () => login(DEMO_EMPRESA_EMAIL, DEMO_PASSWORD),
-    [login],
-  );
+  const loginAsEmpresaDemo = useCallback(async (): Promise<void> => {
+    await login(DEMO_EMPRESA_EMAIL, DEMO_PASSWORD);
+  }, [login]);
 
-  const loginAsProfesionalDemo = useCallback(
-    () => login(DEMO_PROFESIONAL_EMAIL, DEMO_PASSWORD),
-    [login],
-  );
+  const loginAsProfesionalDemo = useCallback(async (): Promise<void> => {
+    await login(DEMO_PROFESIONAL_EMAIL, DEMO_PASSWORD);
+  }, [login]);
 
   const signOut = useCallback(async () => {
     await clearSession();

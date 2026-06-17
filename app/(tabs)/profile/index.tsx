@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '../../../components/Avatar';
 import { CompanyCatalog } from '../../../components/CompanyCatalog';
+import { ProfessionalProfileEditor } from '../../../components/ProfessionalProfileEditor';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useImageUpload } from '../../../hooks/useImageUpload';
 import { getCompanyByUserId } from '../../../services/products';
@@ -13,6 +14,7 @@ import {
   SUPABASE_FOLDER_AVATARS,
   SUPABASE_STORAGE_BUCKET,
 } from '../../../utils/constants';
+import { isCliente, isEmpresa, isProfesional } from '../../../utils/roles';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -22,12 +24,12 @@ export default function ProfileScreen() {
   const [companyError, setCompanyError] = useState<string | null>(null);
 
   const role = user?.role;
-  const isCliente = role === 'cliente';
-  const isEmpresa = role === 'empresa';
-  const isProfesional = role === 'profesional';
+  const showCliente = isCliente(role) || (!isEmpresa(role) && !isProfesional(role));
+  const showEmpresa = isEmpresa(role);
+  const showProfesional = isProfesional(role);
 
   const loadCompany = useCallback(async () => {
-    if (!user?.id || user.role !== 'empresa') {
+    if (!user?.id || !showEmpresa) {
       setCompany(null);
       return;
     }
@@ -42,7 +44,7 @@ export default function ProfileScreen() {
         'No se encontró empresa para este usuario. Ejecuta npm run seed en el backend.',
       );
     }
-  }, [user?.id, user?.role]);
+  }, [showEmpresa, user?.id]);
 
   useEffect(() => {
     void loadCompany();
@@ -59,10 +61,12 @@ export default function ProfileScreen() {
     }
   };
 
+  const profileTitle = showEmpresa ? 'Mi tienda' : 'Perfil';
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="flex-1 px-4 pt-4" contentContainerClassName="pb-10">
-        <Text className="text-2xl font-black text-[#0F172A]">Perfil</Text>
+        <Text className="text-2xl font-black text-[#0F172A]">{profileTitle}</Text>
         {user?.email ? (
           <Text className="mt-1 text-sm text-[#94A3B8]">
             {user.email} · {role ?? 'usuario'}
@@ -91,7 +95,7 @@ export default function ProfileScreen() {
           ) : null}
         </View>
 
-        {isCliente ? (
+        {showCliente ? (
           <Pressable
             className="mt-4 items-center rounded-xl bg-[#0F172A] py-3"
             onPress={() => router.push('/service-requests')}
@@ -100,18 +104,13 @@ export default function ProfileScreen() {
           </Pressable>
         ) : null}
 
-        {isEmpresa && company ? <CompanyCatalog company={company} /> : null}
-        {isEmpresa && companyError ? (
+        {showEmpresa && company ? <CompanyCatalog company={company} /> : null}
+        {showEmpresa && companyError ? (
           <Text className="mt-3 text-center text-xs text-red-600">{companyError}</Text>
         ) : null}
 
-        {isProfesional ? (
-          <View className="mt-6 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-            <Text className="text-sm font-black text-[#0F172A]">Panel profesional</Text>
-            <Text className="mt-2 text-sm text-[#94A3B8]">
-              Próximamente: ofertas, asignaciones y disponibilidad.
-            </Text>
-          </View>
+        {showProfesional && user?.id ? (
+          <ProfessionalProfileEditor userId={user.id} />
         ) : null}
 
         <Pressable

@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfessionalListCard } from '../../../components/ProfessionalListCard';
+import { useRoleRedirect } from '../../../hooks/useRoleRedirect';
 import { formatApiError } from '../../../services/api';
 import {
   getAvailableProfessionals,
@@ -19,9 +20,11 @@ import {
 import { ServiceProvider } from '../../../types';
 import { CATEGORIES } from '../../../utils/constants';
 import { goToProfessionalOffer } from '../../../utils/navigation';
+import { isCliente } from '../../../utils/roles';
 
 export default function ServicesScreen() {
   const router = useRouter();
+  useRoleRedirect(isCliente);
   const { slug } = useLocalSearchParams<{ slug?: string }>();
   const specialtySlug =
     typeof slug === 'string' && slug.length > 0 ? slug : undefined;

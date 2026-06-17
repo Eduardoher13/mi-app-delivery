@@ -13,13 +13,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProductCard } from '../../../components/ProductCard';
+import { useRoleRedirect } from '../../../hooks/useRoleRedirect';
 import { formatApiError, getApiStatus } from '../../../services/api';
 import { getProducts } from '../../../services/products';
 import { Product } from '../../../types';
+import { isCliente } from '../../../utils/roles';
 
 const SEARCH_DEBOUNCE_MS = 400;
 
 export default function ProductsScreen() {
+  useRoleRedirect(isCliente);
   const { q } = useLocalSearchParams<{ q?: string }>();
   const initialQuery = typeof q === 'string' ? q : '';
   const apiStatus = getApiStatus();

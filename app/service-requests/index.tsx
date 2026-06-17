@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../../contexts/AuthContext';
+import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { formatApiError } from '../../services/api';
 import {
   getServiceRequestsForClient,
@@ -19,6 +20,7 @@ import {
   ServiceRequest,
 } from '../../services/serviceRequests';
 import { goToNewServiceRequest } from '../../utils/navigation';
+import { isCliente } from '../../utils/roles';
 
 function formatDate(iso: string): string {
   const date = new Date(iso);
@@ -47,6 +49,7 @@ function statusLabel(status: string): string {
 export default function ServiceRequestsScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  useRoleRedirect(isCliente);
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

@@ -2,6 +2,7 @@ import { Redirect, type Href } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 
 import { useAuth } from '../contexts/AuthContext';
+import { getDefaultTabHref } from '../utils/roles';
 
 export default function Index() {
   const { user, token, loading } = useAuth();
@@ -18,5 +19,5 @@ export default function Index() {
     return <Redirect href={'/login' as Href} />;
   }
 
-  return <Redirect href="/(tabs)/home" />;
+  return <Redirect href={getDefaultTabHref(user.role)} />;
 }

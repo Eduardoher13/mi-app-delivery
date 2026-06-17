@@ -12,9 +12,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatApiError } from '../../services/api';
+import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { getProfessionalById } from '../../services/professionals';
 import { ServiceProviderDetail } from '../../types';
 import { goToNewServiceRequest } from '../../utils/navigation';
+import { isCliente } from '../../utils/roles';
 
 function parseStringParam(value: string | string[] | undefined): string {
   if (Array.isArray(value)) {
@@ -26,6 +28,7 @@ function parseStringParam(value: string | string[] | undefined): string {
 
 export default function ProfessionalOfferScreen() {
   const router = useRouter();
+  useRoleRedirect(isCliente);
   const params = useLocalSearchParams<{
     id: string;
     name?: string;

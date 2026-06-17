@@ -56,6 +56,25 @@ export async function getProfessionalById(
   return mapApiProfessionalDetail(data, specialtySlug);
 }
 
+export interface UpdateProfessionalDto {
+  bio?: string;
+  base_price?: number;
+  is_available?: boolean;
+}
+
+export async function getProfessionalByUserId(userId: string): Promise<ApiProfessional> {
+  const { data } = await api.get<ApiProfessional>(`/professionals/by-user/${userId}`);
+  return data;
+}
+
+export async function updateProfessional(
+  id: string,
+  dto: UpdateProfessionalDto,
+): Promise<ApiProfessional> {
+  const { data } = await api.patch<ApiProfessional>(`/professionals/${id}`, dto);
+  return data;
+}
+
 export async function getAvailableProfessionals(options?: {
   limit?: number;
   offset?: number;

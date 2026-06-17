@@ -21,6 +21,7 @@ import {
   DEMO_PASSWORD,
   DEMO_PROFESIONAL_EMAIL,
 } from '../utils/constants';
+import { getDefaultTabHref } from '../utils/roles';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (!authLoading && user && token) {
-      router.replace('/(tabs)/home');
+      router.replace(getDefaultTabHref(user.role));
     }
   }, [authLoading, user, token, router]);
 
@@ -55,8 +56,8 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      await login(email, password);
-      router.replace('/(tabs)/home');
+      const loggedInUser = await login(email, password);
+      router.replace(getDefaultTabHref(loggedInUser.role));
     } catch (err) {
       setError(formatApiError(err, 'No se pudo iniciar sesión'));
     } finally {
@@ -75,7 +76,13 @@ export default function LoginScreen() {
 
     try {
       await demoLogin();
-      router.replace('/(tabs)/home');
+      router.replace(getDefaultTabHref(
+        demoEmail === DEMO_EMPRESA_EMAIL
+          ? 'empresa'
+          : demoEmail === DEMO_PROFESIONAL_EMAIL
+            ? 'profesional'
+            : 'cliente',
+      ));
     } catch (err) {
       setError(formatApiError(err, 'No se pudo iniciar sesión demo'));
     } finally {

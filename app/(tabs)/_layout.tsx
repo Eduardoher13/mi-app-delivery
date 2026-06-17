@@ -1,7 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 
+import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../utils/colors';
+import {
+  getInitialTabName,
+  hiddenTabOptions,
+  isCliente,
+  isEmpresa,
+  isProfesional,
+} from '../../utils/roles';
 
 type TabIconName = keyof typeof Ionicons.glyphMap;
 
@@ -10,8 +18,17 @@ function TabIcon({ name, color }: { name: TabIconName; color: string }) {
 }
 
 export default function TabsLayout() {
+  const { user, loading } = useAuth();
+  const role = user?.role;
+
+  // Solo las tabs del rol activo aparecen en la barra inferior
+  const showClienteTabs = isCliente(role);
+  const showEmpresaTabs = isEmpresa(role);
+  const showProfesionalTabs = isProfesional(role);
+
   return (
     <Tabs
+      initialRouteName={loading ? undefined : getInitialTabName(role)}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
@@ -30,30 +47,49 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="home/index"
         options={{
           title: 'Inicio',
           tabBarIcon: ({ color }) => <TabIcon name="home" color={color} />,
+          ...hiddenTabOptions(showClienteTabs),
         }}
       />
       <Tabs.Screen
-        name="services"
+        name="services/index"
         options={{
           title: 'Servicios',
           tabBarIcon: ({ color }) => <TabIcon name="construct" color={color} />,
+          ...hiddenTabOptions(showClienteTabs),
         }}
       />
       <Tabs.Screen
-        name="products"
+        name="products/index"
         options={{
           title: 'Productos',
           tabBarIcon: ({ color }) => <TabIcon name="cube" color={color} />,
+          ...hiddenTabOptions(showClienteTabs),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="pro-requests/index"
         options={{
-          title: 'Perfil',
+          title: 'Solicitudes',
+          tabBarIcon: ({ color }) => <TabIcon name="briefcase" color={color} />,
+          ...hiddenTabOptions(showProfesionalTabs),
+        }}
+      />
+      <Tabs.Screen
+        name="empresa-orders/index"
+        options={{
+          title: 'Pedidos',
+          tabBarIcon: ({ color }) => <TabIcon name="receipt" color={color} />,
+          ...hiddenTabOptions(showEmpresaTabs),
+        }}
+      />
+      <Tabs.Screen
+        name="profile/index"
+        options={{
+          title: showEmpresaTabs ? 'Mi tienda' : 'Perfil',
           tabBarIcon: ({ color }) => <TabIcon name="person" color={color} />,
         }}
       />

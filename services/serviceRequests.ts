@@ -82,3 +82,21 @@ export async function getServiceRequestsForClient(
   const all = await getServiceRequests(options);
   return all.filter((request) => request.client_id === clientId);
 }
+
+export async function getServiceRequestById(id: string): Promise<ServiceRequest> {
+  const { data } = await api.get<ServiceRequest>(`/service-requests/${id}`);
+  return data;
+}
+
+export async function getServiceRequestsForProfessional(
+  specialtyIds: number[],
+  options?: { limit?: number },
+): Promise<ServiceRequest[]> {
+  if (specialtyIds.length === 0) {
+    return [];
+  }
+
+  const specialtySet = new Set(specialtyIds);
+  const all = await getServiceRequests({ limit: options?.limit ?? 50 });
+  return all.filter((request) => specialtySet.has(request.specialty_id));
+}

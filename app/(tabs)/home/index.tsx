@@ -19,16 +19,19 @@ import { ProductCard } from '../../../components/ProductCard';
 import { QuickActionButton } from '../../../components/QuickActionButton';
 import { ServiceRequestCard } from '../../../components/ServiceRequestCard';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useRoleRedirect } from '../../../hooks/useRoleRedirect';
 import { formatApiError } from '../../../services/api';
 import { getActiveProducts } from '../../../services/products';
 import { getAvailableProfessionals } from '../../../services/professionals';
 import { Category, Product, ServiceProvider } from '../../../types';
 import { CATEGORIES, MOCK_USER } from '../../../utils/constants';
 import { goToNewServiceRequest, goToProfessionalOffer } from '../../../utils/navigation';
+import { isCliente } from '../../../utils/roles';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  useRoleRedirect(isCliente);
   const [searchQuery, setSearchQuery] = useState('');
   const [featuredServices, setFeaturedServices] = useState<ServiceProvider[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
