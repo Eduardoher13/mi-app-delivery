@@ -37,6 +37,11 @@ module.exports = ({ config }) => ({
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
+  splash: {
+    image: './assets/splash-icon.png',
+    resizeMode: 'contain',
+    backgroundColor: '#1e3a8a',
+  },
   userInterfaceStyle: 'light',
   scheme: 'casaia',
   newArchEnabled: true,
@@ -54,7 +59,7 @@ module.exports = ({ config }) => ({
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: '#00A878',
+      backgroundColor: '#1e3a8a',
       foregroundImage: './assets/icon.png',
     },
     package: 'com.casaia.app',
@@ -70,6 +75,15 @@ module.exports = ({ config }) => ({
     bundler: 'metro',
   },
   plugins: [
+    [
+      'expo-splash-screen',
+      {
+        image: './assets/splash-icon.png',
+        imageWidth: 220,
+        resizeMode: 'contain',
+        backgroundColor: '#1e3a8a',
+      },
+    ],
     'expo-router',
     [
       'expo-location',

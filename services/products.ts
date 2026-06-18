@@ -1,8 +1,9 @@
 import api from './api';
 
 import { ApiProduct, Company, Product } from '../types';
+import { DEFAULT_PRODUCT_STOCK_IMAGE } from '../utils/stockImages';
 
-const FALLBACK_PRODUCT_IMAGE = 'https://picsum.photos/seed/product/400/400';
+const FALLBACK_PRODUCT_IMAGE = DEFAULT_PRODUCT_STOCK_IMAGE;
 
 type ListResponse<T> = [T[], number] | { data: T[]; total: number };
 

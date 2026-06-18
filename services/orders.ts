@@ -6,12 +6,11 @@ import { getUserByEmail } from './users';
 
 import { CartLine } from '../contexts/CartContext';
 import {
-  DELIVERY_DROPOFF_ADDRESS,
-  DELIVERY_DROPOFF_COORDS,
   DELIVERY_PICKUP_ADDRESS,
   DELIVERY_PICKUP_COORDS,
   DEMO_REPARTIDOR_EMAIL,
 } from '../utils/constants';
+import { getDeviceDeliveryCoords } from '../utils/deviceLocation';
 
 export interface Order {
   id: string;
@@ -184,12 +183,13 @@ export async function ensureDeliveryForOrder(orderId: string): Promise<string | 
     }
 
     const driver = await getUserByEmail(DEMO_REPARTIDOR_EMAIL);
+    const dropoff = await getDeviceDeliveryCoords();
 
     const directions = await getDirections(
       DELIVERY_PICKUP_COORDS.latitude,
       DELIVERY_PICKUP_COORDS.longitude,
-      DELIVERY_DROPOFF_COORDS.latitude,
-      DELIVERY_DROPOFF_COORDS.longitude,
+      dropoff.latitude,
+      dropoff.longitude,
     );
 
     const payload: Parameters<typeof createDelivery>[0] = {
@@ -199,9 +199,9 @@ export async function ensureDeliveryForOrder(orderId: string): Promise<string | 
       pickup_address: DELIVERY_PICKUP_ADDRESS,
       pickup_lat: DELIVERY_PICKUP_COORDS.latitude,
       pickup_lng: DELIVERY_PICKUP_COORDS.longitude,
-      delivery_address: DELIVERY_DROPOFF_ADDRESS,
-      delivery_lat: DELIVERY_DROPOFF_COORDS.latitude,
-      delivery_lng: DELIVERY_DROPOFF_COORDS.longitude,
+      delivery_address: dropoff.addressLabel,
+      delivery_lat: dropoff.latitude,
+      delivery_lng: dropoff.longitude,
       duration_seconds: 15 * 60,
     };
 

@@ -17,10 +17,7 @@ import {
   getDeliveryById,
   updateDelivery,
 } from '../../services/deliveries';
-import {
-  DELIVERY_DROPOFF_COORDS,
-  DELIVERY_PICKUP_COORDS,
-} from '../../utils/constants';
+import { DELIVERY_PICKUP_COORDS, MANAGUA_COORDS } from '../../utils/constants';
 import { decodePolyline, LatLng } from '../../utils/decodePolyline';
 import { buildStraightRoute } from '../../utils/deliveryRoute';
 
@@ -111,8 +108,14 @@ export default function DeliveryTrackingScreen() {
   const dropoff = useMemo(
     () =>
       delivery
-        ? toCoord(delivery.delivery_lat, delivery.delivery_lng, DELIVERY_DROPOFF_COORDS)
-        : DELIVERY_DROPOFF_COORDS,
+        ? toCoord(delivery.delivery_lat, delivery.delivery_lng, {
+            latitude: MANAGUA_COORDS.latitude,
+            longitude: MANAGUA_COORDS.longitude,
+          })
+        : {
+            latitude: MANAGUA_COORDS.latitude,
+            longitude: MANAGUA_COORDS.longitude,
+          },
     [delivery],
   );
 

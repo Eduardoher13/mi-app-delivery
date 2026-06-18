@@ -3,6 +3,7 @@ import { parseListResponse } from './products';
 
 import { ApiProfessional, ServiceProvider, ServiceProviderDetail } from '../types';
 import { CATEGORIES } from '../utils/constants';
+import { stockImageForSpecialty } from '../utils/stockImages';
 
 function specialtyLabel(slug?: string): string {
   if (!slug) {
@@ -29,7 +30,7 @@ export function mapApiProfessional(
     rating: Number.parseFloat(professional.avg_rating),
     price: Number.parseFloat(professional.base_price),
     imageUrl:
-      user.avatar_url ?? `https://picsum.photos/seed/pro-${professional.id}/200/200`,
+      user.avatar_url ?? stockImageForSpecialty(specialtySlug),
     specialtySlug,
   };
 }

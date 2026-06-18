@@ -22,18 +22,21 @@ export const MANAGUA_COORDS = {
   longitudeDelta: 0.02,
 } as const;
 
-/** Coordenadas demo para tracking de delivery (Managua). */
+/** Coordenadas demo de la ferretería (origen del reparto). */
 export const DELIVERY_PICKUP_COORDS = {
   latitude: 12.119,
   longitude: -86.274,
 } as const;
 
+export const DELIVERY_PICKUP_ADDRESS = 'Ferretería, Managua, Nicaragua';
+
+/** @deprecated Usar ubicación del dispositivo vía getDeviceDeliveryCoords() */
 export const DELIVERY_DROPOFF_COORDS = {
   latitude: 12.125,
   longitude: -86.28,
 } as const;
 
-export const DELIVERY_PICKUP_ADDRESS = 'Ferretería, Managua, Nicaragua';
+/** @deprecated Usar ubicación del dispositivo vía getDeviceDeliveryCoords() */
 export const DELIVERY_DROPOFF_ADDRESS = 'Managua, Nicaragua';
 
 /** Repartidor demo del seed (npm run seed en casa-ia-desk) */

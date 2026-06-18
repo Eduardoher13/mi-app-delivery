@@ -1,5 +1,5 @@
 import { Redirect, type Href } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Image, View } from 'react-native';
 
 import { useAuth } from '../contexts/AuthContext';
 import { getDefaultTabHref } from '../utils/roles';
@@ -9,8 +9,16 @@ export default function Index() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator color="#00A878" size="large" />
+      <View className="flex-1 items-center justify-center bg-[#1e3a8a]">
+        <Image
+          source={require('../assets/splash-icon.png')}
+          style={{ width: 176, height: 176 }}
+          resizeMode="contain"
+          accessibilityLabel="Listo"
+        />
+        <View className="mt-8">
+          <ActivityIndicator color="#FFFFFF" size="large" />
+        </View>
       </View>
     );
   }
