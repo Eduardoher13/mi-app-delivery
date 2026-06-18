@@ -15,7 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { formatApiError } from '../../services/api';
 import { getDeliveries } from '../../services/deliveries';
-import { getOrdersForClient, Order } from '../../services/orders';
+import { ensureDeliveryForOrder, getOrdersForClient, Order } from '../../services/orders';
 import { resolveClientId } from '../../services/serviceRequests';
 import { isCliente } from '../../utils/roles';
 
@@ -54,6 +54,7 @@ export default function ClientOrdersScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ensuringOrderId, setEnsuringOrderId] = useState<string | null>(null);
 
   const loadOrders = useCallback(
     async (isRefresh = false) => {
@@ -96,6 +97,31 @@ export default function ClientOrdersScreen() {
   useEffect(() => {
     void loadOrders();
   }, [loadOrders]);
+
+  const openTracking = async (order: Order) => {
+    setEnsuringOrderId(order.id);
+    try {
+      let deliveryId = deliveryByOrder[order.id];
+      if (!deliveryId) {
+        const created = await ensureDeliveryForOrder(order.id);
+        if (created) {
+          deliveryId = created;
+          setDeliveryByOrder((prev) => ({ ...prev, [order.id]: created }));
+        }
+      }
+      if (deliveryId) {
+        router.push({
+          pathname: '/delivery/[id]',
+          params: { id: deliveryId },
+        });
+      }
+    } finally {
+      setEnsuringOrderId(null);
+    }
+  };
+
+  const canTrackOrder = (status: string) =>
+    status === 'pagado' || status === 'enviado' || status === 'entregado';
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
@@ -162,20 +188,22 @@ export default function ClientOrdersScreen() {
                       {formatDate(order.created_at)}
                     </Text>
                   </View>
-                  {deliveryId ? (
+                  {canTrackOrder(order.status) ? (
                     <Pressable
                       className="mt-3 flex-row items-center justify-center rounded-lg border border-[#00A878] py-2.5"
-                      onPress={() =>
-                        router.push({
-                          pathname: '/delivery/[id]',
-                          params: { id: deliveryId },
-                        })
-                      }
+                      onPress={() => void openTracking(order)}
+                      disabled={ensuringOrderId === order.id}
                     >
-                      <Ionicons name="navigate-outline" size={16} color="#00A878" />
-                      <Text className="ml-2 text-xs font-bold text-[#00A878]">
-                        Ver ruta
-                      </Text>
+                      {ensuringOrderId === order.id ? (
+                        <ActivityIndicator color="#00A878" size="small" />
+                      ) : (
+                        <>
+                          <Ionicons name="navigate-outline" size={16} color="#00A878" />
+                          <Text className="ml-2 text-xs font-bold text-[#00A878]">
+                            {deliveryId ? 'Ver ruta' : 'Seguir entrega'}
+                          </Text>
+                        </>
+                      )}
                     </Pressable>
                   ) : null}
                 </View>

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -55,12 +55,17 @@ function statusLabel(status: string): string {
   return labels[status] ?? status;
 }
 
-function etaLabel(durationSeconds: number | null): string {
-  if (!durationSeconds || durationSeconds <= 0) {
+function etaLabel(durationSeconds: number | string | null): string {
+  const seconds = Number(durationSeconds);
+  if (!Number.isFinite(seconds) || seconds <= 0) {
     return '—';
   }
-  const minutes = Math.round(durationSeconds / 60);
+  const minutes = Math.round(seconds / 60);
   return `${minutes} min aprox.`;
+}
+
+function formatRef(id?: string | null): string {
+  return id ? id.slice(0, 8) : '—';
 }
 
 export default function DeliveryTrackingScreen() {
@@ -93,6 +98,8 @@ export default function DeliveryTrackingScreen() {
     void load();
   }, [load]);
 
+  const routeRef = useRef<LatLng[]>([]);
+
   const pickup = useMemo(
     () =>
       delivery
@@ -114,17 +121,28 @@ export default function DeliveryTrackingScreen() {
     if (decoded.length > 1) {
       return decoded;
     }
+    if (routeRef.current.length > 1) {
+      return routeRef.current;
+    }
     return buildStraightRoute(pickup, dropoff, 20);
   }, [delivery?.polyline_encoded, pickup, dropoff]);
+
+  useEffect(() => {
+    if (route.length > 1) {
+      routeRef.current = route;
+    }
+  }, [route]);
 
   const isDelivered = delivery?.status === 'entregado';
 
   const { driverPosition, progress, arrived } = useDeliveryTracking({
     deliveryId,
-    route,
+    route: routeRef.current.length > 1 ? routeRef.current : route,
     enabled: Boolean(delivery) && !isDelivered,
     postPings: true,
   });
+
+  const displayDriverPosition = isDelivered ? dropoff : driverPosition;
 
   const handleComplete = async () => {
     if (!delivery) {
@@ -134,9 +152,17 @@ export default function DeliveryTrackingScreen() {
     try {
       const updated = await updateDelivery(delivery.id, {
         status: 'entregado',
-        completed_at: new Date().toISOString(),
       });
-      setDelivery(updated);
+      setDelivery((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: updated.status,
+              completed_at: updated.completed_at ?? prev.completed_at,
+              order_id: updated.order_id || prev.order_id,
+            }
+          : updated,
+      );
     } catch (err) {
       setError(formatApiError(err, 'No se pudo completar la entrega'));
     } finally {
@@ -173,8 +199,8 @@ export default function DeliveryTrackingScreen() {
             <DeliveryMap
               pickup={pickup}
               delivery={dropoff}
-              driverPosition={driverPosition}
-              polylineCoordinates={route}
+              driverPosition={displayDriverPosition}
+              polylineCoordinates={routeRef.current.length > 1 ? routeRef.current : route}
               style={{ flex: 1 }}
             />
           </View>
@@ -182,7 +208,7 @@ export default function DeliveryTrackingScreen() {
           <View className="border-t border-[#E2E8F0] px-4 pb-8 pt-4">
             <View className="flex-row items-center justify-between">
               <Text className="text-base font-black text-[#0F172A]">
-                Pedido #{delivery.order_id.slice(0, 8)}
+                Pedido #{formatRef(delivery.order_id || delivery.id)}
               </Text>
               <View
                 className={`rounded-full px-3 py-1 ${

@@ -1,7 +1,7 @@
 import api from './api';
 import { parseListResponse } from './products';
 import { getProductsByCompany } from './products';
-import { createDelivery, getDirections } from './deliveries';
+import { createDelivery, getDirections, getDeliveryForOrder } from './deliveries';
 import { getUserByEmail } from './users';
 
 import { CartLine } from '../contexts/CartContext';
@@ -170,22 +170,19 @@ export async function checkoutCart(
     status: 'pagado',
   });
 
-  const deliveryId = await createDeliveryForOrder(paidOrder.id);
-
-  if (deliveryId) {
-    try {
-      await updateOrder(paidOrder.id, { status: 'enviado' });
-      paidOrder.status = 'enviado';
-    } catch {
-      // El estado 'enviado' es opcional; conservamos 'pagado' si falla.
-    }
-  }
+  const deliveryId = await ensureDeliveryForOrder(paidOrder.id);
 
   return { order: paidOrder, deliveryId };
 }
 
-async function createDeliveryForOrder(orderId: string): Promise<string | null> {
+/** Crea o reutiliza el delivery demo vinculado a un pedido pagado. */
+export async function ensureDeliveryForOrder(orderId: string): Promise<string | null> {
   try {
+    const existing = await getDeliveryForOrder(orderId);
+    if (existing) {
+      return existing.id;
+    }
+
     const driver = await getUserByEmail(DEMO_REPARTIDOR_EMAIL);
 
     const directions = await getDirections(
@@ -195,7 +192,7 @@ async function createDeliveryForOrder(orderId: string): Promise<string | null> {
       DELIVERY_DROPOFF_COORDS.longitude,
     );
 
-    const delivery = await createDelivery({
+    const payload: Parameters<typeof createDelivery>[0] = {
       order_id: orderId,
       driver_id: driver.id,
       status: 'en_camino',
@@ -205,13 +202,25 @@ async function createDeliveryForOrder(orderId: string): Promise<string | null> {
       delivery_address: DELIVERY_DROPOFF_ADDRESS,
       delivery_lat: DELIVERY_DROPOFF_COORDS.latitude,
       delivery_lng: DELIVERY_DROPOFF_COORDS.longitude,
-      polyline_encoded: directions?.polyline_encoded,
-      distance_meters: directions?.distance_meters,
-      duration_seconds: directions?.duration_seconds,
-    });
+      duration_seconds: 15 * 60,
+    };
 
+    if (directions?.polyline_encoded) {
+      payload.polyline_encoded = directions.polyline_encoded;
+    }
+    if (directions?.distance_meters != null) {
+      payload.distance_meters = Math.round(directions.distance_meters);
+    }
+    if (directions?.duration_seconds != null) {
+      payload.duration_seconds = Math.round(directions.duration_seconds);
+    }
+
+    const delivery = await createDelivery(payload);
     return delivery.id;
-  } catch {
+  } catch (err) {
+    if (__DEV__) {
+      console.warn('[ensureDeliveryForOrder] falló:', err);
+    }
     return null;
   }
 }

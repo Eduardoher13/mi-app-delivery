@@ -18,7 +18,6 @@ export async function postTrackingPing(
     delivery_id: deliveryId,
     lat,
     lng,
-    recorded_at: new Date().toISOString(),
   });
   return data;
 }

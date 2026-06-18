@@ -25,6 +25,30 @@ export function serviceRequestStatusLabel(status: string): string {
   return STATUS_LABELS[status] ?? status;
 }
 
+export type ServiceRequestFilter = 'pendiente' | 'en_progreso' | 'finalizados';
+
+export const SERVICE_REQUEST_FILTERS: { key: ServiceRequestFilter; label: string }[] = [
+  { key: 'pendiente', label: 'Pendiente' },
+  { key: 'en_progreso', label: 'En progreso' },
+  { key: 'finalizados', label: 'Finalizados' },
+];
+
+export function matchesServiceRequestFilter(
+  status: string,
+  filter: ServiceRequestFilter,
+): boolean {
+  switch (filter) {
+    case 'pendiente':
+      return status === 'pendiente' || status === 'aceptado';
+    case 'en_progreso':
+      return status === 'en_progreso';
+    case 'finalizados':
+      return status === 'completado' || status === 'cancelado';
+    default:
+      return true;
+  }
+}
+
 export function serviceRequestTimelineSteps(currentStatus: string): TimelineStep[] {
   if (currentStatus === 'cancelado') {
     return TIMELINE_ORDER.map((key) => ({

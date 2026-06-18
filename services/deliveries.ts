@@ -45,14 +45,35 @@ export interface UpdateDeliveryDto {
   duration_seconds?: number;
 }
 
+type DeliveryApiResponse = Delivery & {
+  order?: { id?: string };
+};
+
+function normalizeDelivery(raw: DeliveryApiResponse): Delivery {
+  const orderId = raw.order_id ?? raw.order?.id ?? '';
+
+  return {
+    ...raw,
+    order_id: orderId,
+    distance_meters:
+      raw.distance_meters === null || raw.distance_meters === undefined
+        ? null
+        : Number(raw.distance_meters),
+    duration_seconds:
+      raw.duration_seconds === null || raw.duration_seconds === undefined
+        ? null
+        : Number(raw.duration_seconds),
+  };
+}
+
 export async function createDelivery(dto: CreateDeliveryDto): Promise<Delivery> {
-  const { data } = await api.post<Delivery>('/deliveries', dto);
-  return data;
+  const { data } = await api.post<DeliveryApiResponse>('/deliveries', dto);
+  return normalizeDelivery(data);
 }
 
 export async function getDeliveryById(id: string): Promise<Delivery> {
-  const { data } = await api.get<Delivery>(`/deliveries/${id}`);
-  return data;
+  const { data } = await api.get<DeliveryApiResponse>(`/deliveries/${id}`);
+  return normalizeDelivery(data);
 }
 
 export async function getDeliveries(options?: {
@@ -68,8 +89,8 @@ export async function getDeliveries(options?: {
   }
 
   const { data } = await api.get('/deliveries', { params });
-  const { items } = parseListResponse<Delivery>(data);
-  return items;
+  const { items } = parseListResponse<DeliveryApiResponse>(data);
+  return items.map(normalizeDelivery);
 }
 
 /** Devuelve el delivery asociado a un pedido, o null si no existe. */
@@ -82,8 +103,8 @@ export async function updateDelivery(
   id: string,
   dto: UpdateDeliveryDto,
 ): Promise<Delivery> {
-  const { data } = await api.patch<Delivery>(`/deliveries/${id}`, dto);
-  return data;
+  const { data } = await api.patch<DeliveryApiResponse>(`/deliveries/${id}`, dto);
+  return normalizeDelivery(data);
 }
 
 export interface DirectionsResult {
