@@ -25,6 +25,7 @@ export default function RootLayout() {
             <Stack.Screen name="cart/index" />
             <Stack.Screen name="order/[id]" />
             <Stack.Screen name="orders/index" />
+            <Stack.Screen name="delivery/[id]" />
           </Stack>
         </CartProvider>
       </AuthProvider>

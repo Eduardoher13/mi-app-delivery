@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { formatApiError } from '../../services/api';
+import { getDeliveries } from '../../services/deliveries';
 import { getOrdersForClient, Order } from '../../services/orders';
 import { resolveClientId } from '../../services/serviceRequests';
 import { isCliente } from '../../utils/roles';
@@ -49,6 +50,7 @@ export default function ClientOrdersScreen() {
   useRoleRedirect(isCliente);
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [deliveryByOrder, setDeliveryByOrder] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +72,17 @@ export default function ClientOrdersScreen() {
         const clientId = await resolveClientId(user);
         const data = await getOrdersForClient(clientId);
         setOrders(data);
+
+        try {
+          const deliveries = await getDeliveries({ limit: 100 });
+          const map: Record<string, string> = {};
+          for (const delivery of deliveries) {
+            map[delivery.order_id] = delivery.id;
+          }
+          setDeliveryByOrder(map);
+        } catch {
+          setDeliveryByOrder({});
+        }
       } catch (err) {
         setError(formatApiError(err));
       } finally {
@@ -126,6 +139,7 @@ export default function ClientOrdersScreen() {
           >
             {orders.map((order) => {
               const total = Number.parseFloat(order.total);
+              const deliveryId = deliveryByOrder[order.id];
 
               return (
                 <View
@@ -148,6 +162,22 @@ export default function ClientOrdersScreen() {
                       {formatDate(order.created_at)}
                     </Text>
                   </View>
+                  {deliveryId ? (
+                    <Pressable
+                      className="mt-3 flex-row items-center justify-center rounded-lg border border-[#00A878] py-2.5"
+                      onPress={() =>
+                        router.push({
+                          pathname: '/delivery/[id]',
+                          params: { id: deliveryId },
+                        })
+                      }
+                    >
+                      <Ionicons name="navigate-outline" size={16} color="#00A878" />
+                      <Text className="ml-2 text-xs font-bold text-[#00A878]">
+                        Ver ruta
+                      </Text>
+                    </Pressable>
+                  ) : null}
                 </View>
               );
             })}

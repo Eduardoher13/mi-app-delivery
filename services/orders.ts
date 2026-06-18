@@ -1,8 +1,17 @@
 import api from './api';
 import { parseListResponse } from './products';
 import { getProductsByCompany } from './products';
+import { createDelivery, getDirections } from './deliveries';
+import { getUserByEmail } from './users';
 
 import { CartLine } from '../contexts/CartContext';
+import {
+  DELIVERY_DROPOFF_ADDRESS,
+  DELIVERY_DROPOFF_COORDS,
+  DELIVERY_PICKUP_ADDRESS,
+  DELIVERY_PICKUP_COORDS,
+  DEMO_REPARTIDOR_EMAIL,
+} from '../utils/constants';
 
 export interface Order {
   id: string;
@@ -123,10 +132,20 @@ export async function getOrdersForClient(clientId: string): Promise<Order[]> {
     );
 }
 
+export interface CheckoutResult {
+  order: Order;
+  deliveryId: string | null;
+}
+
+/**
+ * Confirma el carrito, marca el pedido como pagado y crea un delivery demo
+ * vinculado (repartidor del seed + ruta tienda → casa). Si falla la creación
+ * del delivery, el pedido igual queda pagado y deliveryId será null.
+ */
 export async function checkoutCart(
   clientId: string,
   lines: CartLine[],
-): Promise<Order> {
+): Promise<CheckoutResult> {
   if (lines.length === 0) {
     throw new Error('El carrito está vacío');
   }
@@ -146,10 +165,55 @@ export async function checkoutCart(
     });
   }
 
-  return updateOrder(order.id, {
+  const paidOrder = await updateOrder(order.id, {
     total,
     status: 'pagado',
   });
+
+  const deliveryId = await createDeliveryForOrder(paidOrder.id);
+
+  if (deliveryId) {
+    try {
+      await updateOrder(paidOrder.id, { status: 'enviado' });
+      paidOrder.status = 'enviado';
+    } catch {
+      // El estado 'enviado' es opcional; conservamos 'pagado' si falla.
+    }
+  }
+
+  return { order: paidOrder, deliveryId };
+}
+
+async function createDeliveryForOrder(orderId: string): Promise<string | null> {
+  try {
+    const driver = await getUserByEmail(DEMO_REPARTIDOR_EMAIL);
+
+    const directions = await getDirections(
+      DELIVERY_PICKUP_COORDS.latitude,
+      DELIVERY_PICKUP_COORDS.longitude,
+      DELIVERY_DROPOFF_COORDS.latitude,
+      DELIVERY_DROPOFF_COORDS.longitude,
+    );
+
+    const delivery = await createDelivery({
+      order_id: orderId,
+      driver_id: driver.id,
+      status: 'en_camino',
+      pickup_address: DELIVERY_PICKUP_ADDRESS,
+      pickup_lat: DELIVERY_PICKUP_COORDS.latitude,
+      pickup_lng: DELIVERY_PICKUP_COORDS.longitude,
+      delivery_address: DELIVERY_DROPOFF_ADDRESS,
+      delivery_lat: DELIVERY_DROPOFF_COORDS.latitude,
+      delivery_lng: DELIVERY_DROPOFF_COORDS.longitude,
+      polyline_encoded: directions?.polyline_encoded,
+      distance_meters: directions?.distance_meters,
+      duration_seconds: directions?.duration_seconds,
+    });
+
+    return delivery.id;
+  } catch {
+    return null;
+  }
 }
 
 export async function getOrdersForCompany(companyId: string): Promise<CompanyOrderPreview[]> {

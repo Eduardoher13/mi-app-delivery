@@ -38,7 +38,7 @@ export default function CartScreen() {
 
     try {
       const clientId = await resolveClientId(user);
-      const order = await checkoutCart(clientId, lines);
+      const { order, deliveryId } = await checkoutCart(clientId, lines);
       await clearCart();
       router.replace({
         pathname: '/order/[id]',
@@ -46,6 +46,7 @@ export default function CartScreen() {
           id: order.id,
           total: order.total,
           status: order.status,
+          deliveryId: deliveryId ?? '',
         },
       });
     } catch (err) {
