@@ -29,12 +29,13 @@ function formatDate(iso: string): string {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
 export function OrderInboxCard({ preview }: OrderInboxCardProps) {
-  const { order, itemCount } = preview;
-  const total = Number.parseFloat(order.total);
+  const { order, clientName, lineDetails, companySubtotal } = preview;
 
   return (
     <View className="rounded-xl border border-[#E2E8F0] bg-white p-4">
@@ -46,14 +47,34 @@ export function OrderInboxCard({ preview }: OrderInboxCardProps) {
           {statusLabel(order.status)}
         </Text>
       </View>
-      <Text className="mt-2 text-xs text-[#94A3B8]">
-        {itemCount} producto(s) de tu ferretería
+
+      <Text className="mt-2 text-xs font-semibold text-[#0F172A]">
+        Cliente: {clientName}
       </Text>
-      <View className="mt-3 flex-row items-center justify-between">
-        <Text className="text-sm font-bold text-[#0F172A]">
-          ${Number.isFinite(total) ? total.toFixed(2) : order.total}
+      <Text className="mt-1 text-xs text-[#94A3B8]">{formatDate(order.created_at)}</Text>
+
+      <View className="mt-3 rounded-lg bg-[#F8FAFC] px-3 py-2">
+        {lineDetails.map((line) => (
+          <View
+            key={`${order.id}-${line.productId}`}
+            className="flex-row items-center justify-between py-1"
+          >
+            <Text className="flex-1 pr-2 text-xs text-[#0F172A]" numberOfLines={2}>
+              {line.productName}
+            </Text>
+            <Text className="text-xs font-semibold text-[#94A3B8]">×{line.quantity}</Text>
+            <Text className="ml-2 min-w-[56px] text-right text-xs font-bold text-[#0F172A]">
+              ${line.subtotal.toFixed(2)}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      <View className="mt-3 flex-row items-center justify-between border-t border-[#E2E8F0] pt-3">
+        <Text className="text-xs text-[#94A3B8]">Subtotal ferretería</Text>
+        <Text className="text-sm font-black text-[#00A878]">
+          ${companySubtotal.toFixed(2)}
         </Text>
-        <Text className="text-xs text-[#94A3B8]">{formatDate(order.created_at)}</Text>
       </View>
     </View>
   );

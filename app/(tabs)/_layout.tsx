@@ -65,8 +65,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="products/index"
         options={{
-          title: 'Productos',
-          tabBarIcon: ({ color }) => <TabIcon name="cube" color={color} />,
+          title: 'Tiendas',
+          tabBarIcon: ({ color }) => <TabIcon name="storefront" color={color} />,
           ...hiddenTabOptions(showClienteTabs),
         }}
       />

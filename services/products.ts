@@ -47,12 +47,16 @@ export function parseListResponse<T>(
 }
 
 export function mapApiProduct(product: ApiProduct): Product {
+  const companyName = product.company?.commercial_name ?? 'Ferretería';
+
   return {
     id: product.id,
     name: product.name,
     price: Number.parseFloat(product.price),
     imageUrl: product.image_url ?? FALLBACK_PRODUCT_IMAGE,
-    category: product.company?.commercial_name ?? 'Ferretería',
+    category: companyName,
+    companyId: product.company_id,
+    companyName,
     stock: product.stock,
   };
 }

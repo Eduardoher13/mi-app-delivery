@@ -23,7 +23,7 @@ export function ProductCard({
       <Pressable onPress={() => onPress?.(product)}>
         <Image
           source={{ uri: product.imageUrl }}
-          className="h-32 w-full"
+          style={{ width: '100%', height: 128 }}
           resizeMode="cover"
         />
         <View className="p-3 pb-2">

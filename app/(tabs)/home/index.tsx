@@ -21,6 +21,7 @@ import { QuickActionButton } from '../../../components/QuickActionButton';
 import { ServiceRequestCard } from '../../../components/ServiceRequestCard';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
+import { useAddToCart } from '../../../hooks/useAddToCart';
 import { useRoleRedirect } from '../../../hooks/useRoleRedirect';
 import { formatApiError } from '../../../services/api';
 import { getActiveProducts } from '../../../services/products';
@@ -33,7 +34,8 @@ import { isCliente } from '../../../utils/roles';
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const { addItem, itemCount, subtotal } = useCart();
+  const { itemCount, subtotal } = useCart();
+  const { tryAddToCart } = useAddToCart();
   useRoleRedirect(isCliente);
   const [searchQuery, setSearchQuery] = useState('');
   const [featuredServices, setFeaturedServices] = useState<ServiceProvider[]>([]);
@@ -45,7 +47,7 @@ export default function HomeScreen() {
   const showCart = isCliente(user?.role) && itemCount > 0;
 
   const handleAddToCart = (product: Product) => {
-    addItem(product);
+    tryAddToCart(product);
   };
 
   const goToServices = useCallback(

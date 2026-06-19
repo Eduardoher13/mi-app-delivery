@@ -15,3 +15,12 @@ export async function getUserByEmail(email: string): Promise<ApiUser> {
   );
   return data;
 }
+
+export async function getUserById(id: string): Promise<ApiUser> {
+  const { data } = await api.get<ApiUser>(`/users/${id}`);
+  return data;
+}
+
+export function formatUserName(user: Pick<ApiUser, 'first_name' | 'last_name'>): string {
+  return `${user.first_name} ${user.last_name}`.trim() || 'Cliente';
+}

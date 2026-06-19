@@ -18,13 +18,22 @@ export interface CartLine {
   price: number;
   imageUrl: string;
   quantity: number;
+  companyId: string;
+  companyName: string;
 }
+
+export type AddItemResult =
+  | { ok: true }
+  | { ok: false; reason: 'out_of_stock' | 'different_company'; currentCompanyName?: string };
 
 interface CartContextValue {
   lines: CartLine[];
   itemCount: number;
   subtotal: number;
-  addItem: (product: Product, quantity?: number) => void;
+  cartCompanyId: string | null;
+  cartCompanyName: string | null;
+  addItem: (product: Product, quantity?: number) => AddItemResult;
+  replaceCartWithItem: (product: Product, quantity?: number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
@@ -40,6 +49,18 @@ function computeSubtotal(lines: CartLine[]): number {
   return lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
 }
 
+function buildLine(product: Product, quantity: number): CartLine {
+  return {
+    productId: product.id,
+    name: product.name,
+    price: product.price,
+    imageUrl: product.imageUrl,
+    quantity,
+    companyId: product.companyId,
+    companyName: product.companyName,
+  };
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
@@ -51,7 +72,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (raw) {
           const parsed = JSON.parse(raw) as CartLine[];
           if (Array.isArray(parsed)) {
-            setLines(parsed);
+            const valid = parsed.filter(
+              (line) =>
+                line.productId &&
+                line.companyId &&
+                line.companyName &&
+                line.quantity > 0,
+            );
+            setLines(valid);
           }
         }
       } catch {
@@ -65,7 +93,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const persistLines = useCallback(async (nextLines: CartLine[]) => {
-    setLines(nextLines);
     if (nextLines.length === 0) {
       await AsyncStorage.removeItem(CART_STORAGE_KEY);
       return;
@@ -74,41 +101,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextLines));
   }, []);
 
-  const addItem = useCallback(
+  const addItem = useCallback((product: Product, quantity = 1): AddItemResult => {
+    if (product.stock !== undefined && product.stock <= 0) {
+      return { ok: false, reason: 'out_of_stock' };
+    }
+
+    if (
+      lines.length > 0 &&
+      lines[0]?.companyId &&
+      product.companyId &&
+      lines[0].companyId !== product.companyId
+    ) {
+      return {
+        ok: false,
+        reason: 'different_company',
+        currentCompanyName: lines[0].companyName,
+      };
+    }
+
+    const qty = Math.max(1, quantity);
+    const existing = lines.find((line) => line.productId === product.id);
+    const next = existing
+      ? lines.map((line) =>
+          line.productId === product.id
+            ? { ...line, quantity: line.quantity + qty }
+            : line,
+        )
+      : [...lines, buildLine(product, qty)];
+
+    setLines(next);
+    void persistLines(next);
+    return { ok: true };
+  }, [lines, persistLines]);
+
+  const replaceCartWithItem = useCallback(
     (product: Product, quantity = 1) => {
-      if (product.stock !== undefined && product.stock <= 0) {
-        return;
-      }
-
       const qty = Math.max(1, quantity);
-      setLines((current) => {
-        const existing = current.find((line) => line.productId === product.id);
-        let next: CartLine[];
-
-        if (existing) {
-          next = current.map((line) =>
-            line.productId === product.id
-              ? { ...line, quantity: line.quantity + qty }
-              : line,
-          );
-        } else {
-          next = [
-            ...current,
-            {
-              productId: product.id,
-              name: product.name,
-              price: product.price,
-              imageUrl: product.imageUrl,
-              quantity: qty,
-            },
-          ];
-        }
-
-        void AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(next));
-        return next;
-      });
+      const next = [buildLine(product, qty)];
+      setLines(next);
+      void persistLines(next);
     },
-    [],
+    [persistLines],
   );
 
   const updateQuantity = useCallback(
@@ -121,35 +154,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 line.productId === productId ? { ...line, quantity } : line,
               );
 
-        void (async () => {
-          if (next.length === 0) {
-            await AsyncStorage.removeItem(CART_STORAGE_KEY);
-          } else {
-            await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(next));
-          }
-        })();
-
+        void persistLines(next);
         return next;
       });
     },
-    [],
+    [persistLines],
   );
 
   const removeItem = useCallback(
     (productId: string) => {
       setLines((current) => {
         const next = current.filter((line) => line.productId !== productId);
-        void (async () => {
-          if (next.length === 0) {
-            await AsyncStorage.removeItem(CART_STORAGE_KEY);
-          } else {
-            await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(next));
-          }
-        })();
+        void persistLines(next);
         return next;
       });
     },
-    [],
+    [persistLines],
   );
 
   const clearCart = useCallback(async () => {
@@ -159,18 +179,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const itemCount = useMemo(() => computeItemCount(lines), [lines]);
   const subtotal = useMemo(() => computeSubtotal(lines), [lines]);
+  const cartCompanyId = lines[0]?.companyId ?? null;
+  const cartCompanyName = lines[0]?.companyName ?? null;
 
   const value = useMemo(
     () => ({
       lines: hydrated ? lines : [],
       itemCount: hydrated ? itemCount : 0,
       subtotal: hydrated ? subtotal : 0,
+      cartCompanyId: hydrated ? cartCompanyId : null,
+      cartCompanyName: hydrated ? cartCompanyName : null,
       addItem,
+      replaceCartWithItem,
       updateQuantity,
       removeItem,
       clearCart,
     }),
-    [addItem, clearCart, hydrated, itemCount, lines, removeItem, subtotal, updateQuantity],
+    [
+      addItem,
+      cartCompanyId,
+      cartCompanyName,
+      clearCart,
+      hydrated,
+      itemCount,
+      lines,
+      removeItem,
+      replaceCartWithItem,
+      subtotal,
+      updateQuantity,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

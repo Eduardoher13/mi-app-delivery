@@ -1,8 +1,9 @@
 import api from './api';
 import { parseListResponse } from './products';
 import { getProductsByCompany } from './products';
-import { createDelivery, getDirections, getDeliveryForOrder } from './deliveries';
-import { getUserByEmail } from './users';
+import { getClientById } from './clients';
+import { formatUserName, getUserByEmail, getUserById } from './users';
+import { fetchAllPages } from '../utils/pagination';
 
 import { CartLine } from '../contexts/CartContext';
 import {
@@ -11,6 +12,7 @@ import {
   DEMO_REPARTIDOR_EMAIL,
 } from '../utils/constants';
 import { getDeviceDeliveryCoords } from '../utils/deviceLocation';
+import { createDelivery, getDirections, getDeliveryForOrder } from './deliveries';
 
 export interface Order {
   id: string;
@@ -30,10 +32,21 @@ export interface OrderItem {
   subtotal: string;
 }
 
+export interface CompanyOrderLineDetail {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
 export interface CompanyOrderPreview {
   order: Order;
   items: OrderItem[];
   itemCount: number;
+  clientName: string;
+  lineDetails: CompanyOrderLineDetail[];
+  companySubtotal: number;
 }
 
 export interface CreateOrderItemDto {
@@ -42,6 +55,22 @@ export interface CreateOrderItemDto {
   quantity: number;
   unit_price: number;
   subtotal: number;
+}
+
+async function fetchAllOrders(): Promise<Order[]> {
+  return fetchAllPages(async (offset, limit) => {
+    const { data } = await api.get('/orders', { params: { offset, limit } });
+    const parsed = parseListResponse<Order>(data);
+    return { items: parsed.items, total: parsed.total };
+  });
+}
+
+async function fetchAllOrderItems(): Promise<OrderItem[]> {
+  return fetchAllPages(async (offset, limit) => {
+    const { data } = await api.get('/order-items', { params: { offset, limit } });
+    const parsed = parseListResponse<OrderItem>(data);
+    return { items: parsed.items, total: parsed.total };
+  });
 }
 
 export async function createOrder(clientId: string): Promise<Order> {
@@ -118,12 +147,12 @@ export async function getOrderItems(options?: {
 }
 
 export async function getOrderItemsByOrderId(orderId: string): Promise<OrderItem[]> {
-  const all = await getOrderItems({ limit: 200 });
+  const all = await fetchAllOrderItems();
   return all.filter((item) => item.order_id === orderId);
 }
 
 export async function getOrdersForClient(clientId: string): Promise<Order[]> {
-  const all = await getOrders({ limit: 50 });
+  const all = await fetchAllOrders();
   return all
     .filter((order) => order.client_id === clientId && order.status !== 'carrito')
     .sort(
@@ -147,6 +176,11 @@ export async function checkoutCart(
 ): Promise<CheckoutResult> {
   if (lines.length === 0) {
     throw new Error('El carrito está vacío');
+  }
+
+  const companyIds = new Set(lines.map((line) => line.companyId));
+  if (companyIds.size > 1) {
+    throw new Error('Solo puedes comprar productos de una ferretería por pedido');
   }
 
   const order = await createOrder(clientId);
@@ -225,14 +259,33 @@ export async function ensureDeliveryForOrder(orderId: string): Promise<string | 
   }
 }
 
+async function resolveClientName(clientId: string, cache: Map<string, string>): Promise<string> {
+  if (cache.has(clientId)) {
+    return cache.get(clientId)!;
+  }
+
+  try {
+    const client = await getClientById(clientId);
+    const user = await getUserById(client.user_id);
+    const name = formatUserName(user);
+    cache.set(clientId, name);
+    return name;
+  } catch {
+    cache.set(clientId, 'Cliente');
+    return 'Cliente';
+  }
+}
+
 export async function getOrdersForCompany(companyId: string): Promise<CompanyOrderPreview[]> {
   const [products, orders, allItems] = await Promise.all([
     getProductsByCompany(companyId),
-    getOrders({ limit: 50 }),
-    getOrderItems({ limit: 200 }),
+    fetchAllOrders(),
+    fetchAllOrderItems(),
   ]);
 
-  const productIds = new Set(products.map((product) => product.id));
+  const productMap = new Map(products.map((product) => [product.id, product]));
+  const productIds = new Set(productMap.keys());
+  const clientNameCache = new Map<string, string>();
   const previews: CompanyOrderPreview[] = [];
 
   for (const order of orders) {
@@ -244,13 +297,35 @@ export async function getOrdersForCompany(companyId: string): Promise<CompanyOrd
       (item) => item.order_id === order.id && productIds.has(item.product_id),
     );
 
-    if (items.length > 0) {
-      previews.push({
-        order,
-        items,
-        itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-      });
+    if (items.length === 0) {
+      continue;
     }
+
+    const lineDetails: CompanyOrderLineDetail[] = items.map((item) => {
+      const product = productMap.get(item.product_id);
+      const unitPrice = Number.parseFloat(item.unit_price);
+      const subtotal = Number.parseFloat(item.subtotal);
+
+      return {
+        productId: item.product_id,
+        productName: product?.name ?? 'Producto',
+        quantity: item.quantity,
+        unitPrice: Number.isFinite(unitPrice) ? unitPrice : 0,
+        subtotal: Number.isFinite(subtotal) ? subtotal : 0,
+      };
+    });
+
+    const companySubtotal = lineDetails.reduce((sum, line) => sum + line.subtotal, 0);
+    const clientName = await resolveClientName(order.client_id, clientNameCache);
+
+    previews.push({
+      order,
+      items,
+      itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+      clientName,
+      lineDetails,
+      companySubtotal,
+    });
   }
 
   return previews.sort(

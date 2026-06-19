@@ -35,7 +35,7 @@ export function ProfessionalListCard({ service, onPress }: ProfessionalListCardP
       <Pressable className="flex-row" onPress={handlePress}>
         <Image
           source={{ uri: service.imageUrl }}
-          className="h-28 w-28"
+          style={{ width: 112, height: 112 }}
           resizeMode="cover"
         />
         <View className="flex-1 justify-center p-3">

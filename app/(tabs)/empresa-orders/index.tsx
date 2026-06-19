@@ -61,8 +61,8 @@ export default function EmpresaOrdersScreen() {
         <Text className="text-2xl font-black text-[#0F172A]">Pedidos de clientes</Text>
         <Text className="mt-1 text-sm text-[#94A3B8]">
           {!loading && !error
-            ? `${orders.length} pedido(s) con productos de tu ferretería`
-            : 'Pedidos de clientes con productos de tu catálogo'}
+            ? `${orders.length} pedido(s) · detalle por cliente y producto`
+            : 'Reporte de compras con detalle por cliente'}
         </Text>
 
         {loading ? (

@@ -24,7 +24,8 @@ export default function CartScreen() {
   const { user } = useAuth();
   useRoleRedirect(isCliente);
 
-  const { lines, subtotal, updateQuantity, removeItem, clearCart } = useCart();
+  const { lines, subtotal, updateQuantity, removeItem, clearCart, cartCompanyName } =
+    useCart();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,6 +69,9 @@ export default function CartScreen() {
             <Ionicons name="arrow-back" size={20} color="#0F172A" />
           </Pressable>
           <Text className="text-lg font-black text-[#0F172A]">Mi carrito</Text>
+          {cartCompanyName ? (
+            <Text className="text-xs text-[#94A3B8]">{cartCompanyName}</Text>
+          ) : null}
         </View>
 
         {lines.length === 0 ? (
@@ -80,7 +84,7 @@ export default function CartScreen() {
               className="mt-6 rounded-xl bg-[#00A878] px-6 py-3"
               onPress={() => router.push('/(tabs)/products')}
             >
-              <Text className="text-sm font-bold text-white">Ver productos</Text>
+              <Text className="text-sm font-bold text-white">Ver ferreterías</Text>
             </Pressable>
           </View>
         ) : (
@@ -93,7 +97,7 @@ export default function CartScreen() {
                 >
                   <Image
                     source={{ uri: line.imageUrl }}
-                    className="h-20 w-20 rounded-lg"
+                    style={{ width: 80, height: 80, borderRadius: 8 }}
                     resizeMode="cover"
                   />
                   <View className="ml-3 flex-1">
