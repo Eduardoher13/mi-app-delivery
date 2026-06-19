@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -69,6 +69,12 @@ export default function ServicesScreen() {
   useEffect(() => {
     void loadProfessionals();
   }, [loadProfessionals]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void loadProfessionals(true);
+    }, [loadProfessionals]),
+  );
 
   const handleSelectSlug = (nextSlug?: string) => {
     router.setParams({ slug: nextSlug ?? '' });

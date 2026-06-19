@@ -117,7 +117,7 @@ export default function LoginScreen() {
           <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
             BIENVENIDO A
           </Text>
-          <Text className="text-3xl font-black italic text-[#00A878]">CasaIA</Text>
+          <Text className="text-3xl font-black italic text-[#00A878]">Listo!</Text>
           <Text className="mt-2 text-sm text-[#94A3B8]">
             Inicia sesión para solicitar servicios o gestionar tu cuenta
           </Text>

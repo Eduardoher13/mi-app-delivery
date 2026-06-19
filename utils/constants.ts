@@ -42,8 +42,8 @@ export const DELIVERY_DROPOFF_ADDRESS = 'Managua, Nicaragua';
 /** Repartidor demo del seed (npm run seed en casa-ia-desk) */
 export const DEMO_REPARTIDOR_EMAIL = 'repartidor@demo.com';
 
-export const AUTH_TOKEN_KEY = '@casaia/auth_token';
-export const AUTH_USER_KEY = '@casaia/user';
+export const AUTH_TOKEN_KEY = '@listo/auth_token';
+export const AUTH_USER_KEY = '@listo/user';
 
 /** Usuario empresa del seed del backend (npm run seed en casa-ia-desk) */
 export const DEMO_EMPRESA_EMAIL = 'tienda@empresa.com';

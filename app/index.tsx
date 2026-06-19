@@ -14,7 +14,7 @@ export default function Index() {
           source={require('../assets/splash-icon.png')}
           style={{ width: 176, height: 176 }}
           resizeMode="contain"
-          accessibilityLabel="Listo"
+          accessibilityLabel="Listo!"
         />
         <View className="mt-8">
           <ActivityIndicator color="#FFFFFF" size="large" />

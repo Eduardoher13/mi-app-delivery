@@ -25,8 +25,8 @@ if [ ! -f "$KEYSTORE" ]; then
 fi
 
 echo ""
-echo "=== CasaIA — huellas para Google Cloud Console ==="
-echo "Package name: com.casaia.app"
+echo "=== Listo! — huellas para Google Cloud Console ==="
+echo "Package name: com.listo.app"
 echo ""
 "$KEYTOOL" -list -v \
   -keystore "$KEYSTORE" \
@@ -35,7 +35,7 @@ echo ""
   -keypass android | grep -E "SHA1:|SHA256:"
 echo ""
 echo "En Google Cloud → Credentials → tu API key → Android apps:"
-echo "  Package: com.casaia.app"
+echo "  Package: com.listo.app"
 echo "  SHA-1:   (el valor SHA1 de arriba)"
 echo ""
 echo "Nota: builds con EAS usan otro SHA-1. Obténlo con: npx eas-cli credentials -p android"

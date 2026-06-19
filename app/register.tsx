@@ -115,7 +115,7 @@ export default function RegisterScreen() {
           <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
             CREAR CUENTA EN
           </Text>
-          <Text className="text-3xl font-black italic text-[#00A878]">CasaIA</Text>
+          <Text className="text-3xl font-black italic text-[#00A878]">Listo!</Text>
           <Text className="mt-2 text-sm text-[#94A3B8]">
             Regístrate como cliente para solicitar servicios y comprar materiales
           </Text>

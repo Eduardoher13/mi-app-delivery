@@ -32,7 +32,7 @@ const autoApiBaseUrl = `http://${getLanIp()}:${API_PORT}`;
 
 module.exports = ({ config }) => ({
   ...config,
-  name: 'CasaIA',
+  name: 'Listo!',
   slug: 'casaia',
   version: '1.0.0',
   orientation: 'portrait',
@@ -43,11 +43,11 @@ module.exports = ({ config }) => ({
     backgroundColor: '#1e3a8a',
   },
   userInterfaceStyle: 'light',
-  scheme: 'casaia',
+  scheme: 'listo',
   newArchEnabled: true,
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.casaia.app',
+    bundleIdentifier: 'com.listo.app',
     config: {
       googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
     },
@@ -62,7 +62,7 @@ module.exports = ({ config }) => ({
       backgroundColor: '#1e3a8a',
       foregroundImage: './assets/icon.png',
     },
-    package: 'com.casaia.app',
+    package: 'com.listo.app',
     usesCleartextTraffic: true,
     config: {
       googleMaps: {
@@ -89,14 +89,14 @@ module.exports = ({ config }) => ({
       'expo-location',
       {
         locationAlwaysAndWhenInUsePermission:
-          'CasaIA necesita acceder a tu ubicación para mostrar profesionales cercanos.',
+          'Listo! necesita acceder a tu ubicación para mostrar profesionales cercanos.',
       },
     ],
     [
       'expo-image-picker',
       {
         photosPermission:
-          'CasaIA necesita acceder a tus fotos para subir imágenes de perfil.',
+          'Listo! necesita acceder a tus fotos para subir imágenes de perfil.',
       },
     ],
   ],

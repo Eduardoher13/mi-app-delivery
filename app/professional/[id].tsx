@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -48,47 +48,47 @@ export default function ProfessionalOfferScreen() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadProfessional = useCallback(async () => {
     if (!professionalId) {
       setLoading(false);
       return;
     }
 
-    async function loadProfessional() {
-      setLoading(true);
-      setFetchError(null);
+    setLoading(true);
+    setFetchError(null);
 
-      try {
-        const slugFromApi =
-          paramSpecialtySlug ??
-          (await getPrimarySpecialtySlugByProfessional(professionalId)) ??
-          undefined;
+    try {
+      const slugFromApi =
+        paramSpecialtySlug ??
+        (await getPrimarySpecialtySlugByProfessional(professionalId)) ??
+        undefined;
 
-        if (slugFromApi) {
-          setResolvedSlug(slugFromApi);
-        }
-
-        const data = await getProfessionalById(professionalId, slugFromApi);
-        setDetail(data);
-      } catch (err) {
-        setFetchError(formatApiError(err));
-        setDetail(null);
-      } finally {
-        setLoading(false);
+      if (slugFromApi) {
+        setResolvedSlug(slugFromApi);
       }
-    }
 
-    void loadProfessional();
+      const data = await getProfessionalById(professionalId, slugFromApi);
+      setDetail(data);
+    } catch (err) {
+      setFetchError(formatApiError(err));
+      setDetail(null);
+    } finally {
+      setLoading(false);
+    }
   }, [professionalId, paramSpecialtySlug]);
 
-  const name = detail?.name ?? params.name ?? 'Profesional';
-  const role = detail?.role ?? params.role ?? 'Servicio verificado';
-  const rating = detail?.rating ?? Number.parseFloat(params.rating ?? '0');
-  const price = detail?.price ?? Number.parseFloat(params.price ?? '0');
+  useFocusEffect(
+    useCallback(() => {
+      void loadProfessional();
+    }, [loadProfessional]),
+  );
+
+  const name = detail?.name ?? 'Profesional';
+  const role = detail?.role ?? 'Servicio verificado';
+  const rating = detail?.rating ?? 0;
+  const price = detail?.price ?? 0;
   const imageUrl =
-    detail?.imageUrl ??
-    params.imageUrl ??
-    `https://picsum.photos/seed/pro-${professionalId}/400/400`;
+    detail?.imageUrl ?? `https://picsum.photos/seed/pro-${professionalId}/400/400`;
   const specialtySlug = detail?.specialtySlug ?? resolvedSlug ?? paramSpecialtySlug;
 
   return (

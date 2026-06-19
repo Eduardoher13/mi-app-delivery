@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -101,6 +101,12 @@ export default function HomeScreen() {
     void loadHomeData();
   }, [loadHomeData]);
 
+  useFocusEffect(
+    useCallback(() => {
+      void loadHomeData(true);
+    }, [loadHomeData]),
+  );
+
   const handleCategoryPress = (category: Category) => {
     goToServices(category.slug);
   };
@@ -131,7 +137,7 @@ export default function HomeScreen() {
                 BIENVENIDO
               </Text>
               <Text className="text-2xl font-black italic text-[#00A878]">
-                CasaIA
+                Listo!
               </Text>
             </View>
             <View className="flex-row items-center gap-3">

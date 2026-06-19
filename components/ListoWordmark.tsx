@@ -11,7 +11,7 @@ export function ListoWordmark({ width = 180, height = 52, style }: ListoWordmark
     <Image
       source={require('../assets/listo-wordmark.png')}
       style={[{ width, height, resizeMode: 'contain' }, style]}
-      accessibilityLabel="Listo"
+      accessibilityLabel="Listo!"
     />
   );
 }

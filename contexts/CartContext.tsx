@@ -10,7 +10,7 @@ import React, {
 
 import { Product } from '../types';
 
-const CART_STORAGE_KEY = '@casaia/cart';
+const CART_STORAGE_KEY = '@listo/cart';
 
 export interface CartLine {
   productId: string;

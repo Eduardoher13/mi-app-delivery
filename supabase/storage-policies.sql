@@ -1,4 +1,4 @@
--- CasaIA — políticas Storage para bucket: product_images
+-- Listo! — políticas Storage para bucket: product_images
 -- Misma lógica que Floristeria (CATALOGOFLORISTERIA): INSERT + SELECT + DELETE → public
 -- Supabase → SQL Editor → pegar TODO → Run
 --
