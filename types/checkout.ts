@@ -1,3 +1,5 @@
+import { formatPhoneForDisplay } from '../utils/phoneFormat';
+
 export interface OrderDeliveryDetails {
   contactName: string;
   phone: string;
@@ -7,7 +9,7 @@ export interface OrderDeliveryDetails {
 }
 
 export function formatDeliveryAddress(details: OrderDeliveryDetails): string {
-  const contact = `${details.contactName.trim()} · ${details.phone.trim()}`;
+  const contact = `${details.contactName.trim()} · ${formatPhoneForDisplay(details.phone)}`;
   const lines = [contact, details.address.trim()];
 
   if (details.latitude != null && details.longitude != null) {

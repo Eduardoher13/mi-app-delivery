@@ -14,8 +14,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../contexts/AuthContext';
+import { PhoneInput } from '../components/PhoneInput';
 import { formatApiError } from '../services/api';
 import { getDefaultTabHref } from '../utils/roles';
+import { isOptionalPhoneValid } from '../utils/phoneFormat';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -58,6 +60,11 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (!isOptionalPhoneValid(phone)) {
+      setError('Ingresa un teléfono válido de 8 dígitos (ej: 8888 8888).');
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -67,7 +74,7 @@ export default function RegisterScreen() {
         password,
         firstName,
         lastName,
-        phone: phone.trim() || undefined,
+        phone: phone || undefined,
         city: city.trim() || undefined,
       });
       router.replace(getDefaultTabHref(registeredUser.role));
@@ -159,14 +166,10 @@ export default function RegisterScreen() {
           <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
             TELÉFONO (OPCIONAL)
           </Text>
-          <TextInput
-            className="rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A]"
-            placeholder="8888 8888"
-            placeholderTextColor="#94A3B8"
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-          />
+          <PhoneInput value={phone} onChangeValue={setPhone} />
+          <Text className="mt-1 text-[10px] text-[#94A3B8]">
+            8 dígitos · formato 8888 8888
+          </Text>
 
           <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
             CIUDAD (OPCIONAL)

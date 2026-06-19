@@ -13,6 +13,7 @@ import MapView, { Marker, Region } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../../contexts/AuthContext';
+import { PhoneInput } from '../../components/PhoneInput';
 import { useCart } from '../../contexts/CartContext';
 import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { formatApiError } from '../../services/api';
@@ -22,6 +23,7 @@ import { resolveClientId } from '../../services/serviceRequests';
 import { OrderDeliveryDetails } from '../../types/checkout';
 import { MANAGUA_COORDS } from '../../utils/constants';
 import { getFastMapCoords, warmUpDeviceLocation } from '../../utils/deviceLocation';
+import { isValidAppPhone } from '../../utils/phoneFormat';
 import { isCliente } from '../../utils/roles';
 
 export default function CartCheckoutScreen() {
@@ -110,8 +112,8 @@ export default function CartCheckoutScreen() {
       return false;
     }
 
-    if (!phone.trim()) {
-      setValidationError('El teléfono es obligatorio.');
+    if (!phone.trim() || !isValidAppPhone(phone)) {
+      setValidationError('Ingresa un teléfono válido de 8 dígitos (ej: 8888 8888).');
       return false;
     }
 
@@ -134,7 +136,7 @@ export default function CartCheckoutScreen() {
 
     const deliveryDetails: OrderDeliveryDetails = {
       contactName: contactName.trim(),
-      phone: phone.trim(),
+      phone,
       address: address.trim(),
       latitude: mapCoords?.latitude,
       longitude: mapCoords?.longitude,
@@ -220,14 +222,10 @@ export default function CartCheckoutScreen() {
             <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
               TELÉFONO
             </Text>
-            <TextInput
-              className="rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A]"
-              placeholder="Ej: +505 8888-0000"
-              placeholderTextColor="#94A3B8"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-            />
+            <PhoneInput value={phone} onChangeValue={setPhone} />
+            <Text className="mt-1 text-[10px] text-[#94A3B8]">
+              8 dígitos · formato 8888 8888
+            </Text>
 
             <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
               DIRECCIÓN DE ENTREGA
