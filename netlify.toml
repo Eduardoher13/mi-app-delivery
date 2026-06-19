@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build:web"
+  publish = "dist"
+
+# Expo Router: rutas del lado del cliente (login, tabs, etc.)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
