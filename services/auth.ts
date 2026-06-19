@@ -34,6 +34,25 @@ export async function login(email: string, password: string): Promise<LoginRespo
   return data;
 }
 
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  role?: string;
+  phone?: string;
+  city?: string;
+}
+
+export async function register(payload: RegisterPayload): Promise<AuthUser> {
+  const { data } = await api.post<AuthUser>('/auth/register', {
+    role: 'cliente',
+    ...payload,
+    email: payload.email.trim(),
+  });
+  return data;
+}
+
 export async function getMe(): Promise<AuthUser> {
   const { data } = await api.get<AuthUser>('/auth/me');
   return data;

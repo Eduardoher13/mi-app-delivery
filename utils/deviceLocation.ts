@@ -8,19 +8,64 @@ export interface DeviceCoords {
   addressLabel: string;
 }
 
+export interface MapCoords {
+  latitude: number;
+  longitude: number;
+}
+
+async function ensureForegroundLocationPermission(): Promise<boolean> {
+  let { status } = await Location.getForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    ({ status } = await Location.requestForegroundPermissionsAsync());
+  }
+
+  return status === 'granted';
+}
+
+/** Precalienta permisos y caché de GPS para respuestas más rápidas al pulsar el botón. */
+export async function warmUpDeviceLocation(): Promise<void> {
+  try {
+    const granted = await ensureForegroundLocationPermission();
+    if (!granted) {
+      return;
+    }
+
+    await Location.getLastKnownPositionAsync({ maxAge: 120_000 });
+  } catch {
+    // Ignorar: el botón volverá a intentarlo.
+  }
+}
+
+/** Ubicación rápida para el mapa: usa la última posición conocida y solo GPS si hace falta. */
+export async function getFastMapCoords(): Promise<MapCoords> {
+  const granted = await ensureForegroundLocationPermission();
+  if (!granted) {
+    throw new Error('Permiso de ubicación denegado');
+  }
+
+  const last = await Location.getLastKnownPositionAsync({ maxAge: 120_000 });
+  if (last) {
+    return {
+      latitude: last.coords.latitude,
+      longitude: last.coords.longitude,
+    };
+  }
+
+  const position = await Location.getCurrentPositionAsync({
+    accuracy: Location.Accuracy.Lowest,
+  });
+
+  return {
+    latitude: position.coords.latitude,
+    longitude: position.coords.longitude,
+  };
+}
+
 /** Ubicación actual del dispositivo para destino de entrega; fallback Managua si falla. */
 export async function getDeviceDeliveryCoords(): Promise<DeviceCoords> {
   try {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      return managuaFallback('Ubicación no permitida — Managua (demo)');
-    }
-
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
-
-    const { latitude, longitude } = position.coords;
+    const coords = await getFastMapCoords();
+    const { latitude, longitude } = coords;
 
     return {
       latitude,

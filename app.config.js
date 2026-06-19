@@ -111,7 +111,8 @@ module.exports = ({ config }) => ({
     apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL?.trim() || autoApiBaseUrl,
     router: {},
     eas: {
-      projectId: process.env.EAS_PROJECT_ID ?? '',
+      projectId:
+        process.env.EAS_PROJECT_ID?.trim() || 'c6311bd1-a305-4ec3-9429-d45555911f10',
     },
   },
 });

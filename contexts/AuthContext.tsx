@@ -13,7 +13,9 @@ import {
   getMe,
   login as apiLogin,
   mapAuthUserToUser,
+  register as apiRegister,
 } from '../services/auth';
+import { createClient } from '../services/clients';
 import { updateUser } from '../services/users';
 import { User } from '../types';
 import {
@@ -30,6 +32,14 @@ interface AuthContextValue {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  registerCliente: (input: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    city?: string;
+  }) => Promise<User>;
   signOut: () => Promise<void>;
   updateAvatarUrl: (avatarUrl: string) => Promise<void>;
   loginAsClienteDemo: () => Promise<void>;
@@ -124,6 +134,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [persistSession],
   );
 
+  const registerCliente = useCallback(
+    async (input: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      phone?: string;
+      city?: string;
+    }): Promise<User> => {
+      const authUser = await apiRegister({
+        email: input.email,
+        password: input.password,
+        first_name: input.firstName.trim(),
+        last_name: input.lastName.trim(),
+        role: 'cliente',
+        phone: input.phone?.trim() || undefined,
+        city: input.city?.trim() || undefined,
+      });
+
+      await createClient(authUser.id);
+
+      const response = await apiLogin(input.email.trim(), input.password);
+      const nextUser = mapAuthUserToUser(response.user);
+      await persistSession(nextUser, response.access_token);
+      return nextUser;
+    },
+    [persistSession],
+  );
+
   const loginAsClienteDemo = useCallback(async (): Promise<void> => {
     await login(DEMO_CLIENTE_EMAIL, DEMO_PASSWORD);
   }, [login]);
@@ -166,6 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       token,
       loading,
       login,
+      registerCliente,
       signOut,
       updateAvatarUrl,
       loginAsClienteDemo,
@@ -177,6 +217,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       token,
       loading,
       login,
+      registerCliente,
       signOut,
       updateAvatarUrl,
       loginAsClienteDemo,

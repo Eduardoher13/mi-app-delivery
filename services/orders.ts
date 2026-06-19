@@ -7,11 +7,16 @@ import { fetchAllPages } from '../utils/pagination';
 
 import { CartLine } from '../contexts/CartContext';
 import {
+  formatDeliveryAddress,
+  OrderDeliveryDetails,
+} from '../types/checkout';
+import {
   DELIVERY_PICKUP_ADDRESS,
   DELIVERY_PICKUP_COORDS,
   DEMO_REPARTIDOR_EMAIL,
+  MANAGUA_COORDS,
 } from '../utils/constants';
-import { getDeviceDeliveryCoords } from '../utils/deviceLocation';
+import { DeviceCoords, getDeviceDeliveryCoords } from '../utils/deviceLocation';
 import { createDelivery, getDirections, getDeliveryForOrder } from './deliveries';
 
 export interface Order {
@@ -173,6 +178,7 @@ export interface CheckoutResult {
 export async function checkoutCart(
   clientId: string,
   lines: CartLine[],
+  deliveryDetails: OrderDeliveryDetails,
 ): Promise<CheckoutResult> {
   if (lines.length === 0) {
     throw new Error('El carrito está vacío');
@@ -203,13 +209,15 @@ export async function checkoutCart(
     status: 'pagado',
   });
 
-  const deliveryId = await ensureDeliveryForOrder(paidOrder.id);
+  const deliveryId = await createDeliveryForOrder(paidOrder.id, deliveryDetails);
 
   return { order: paidOrder, deliveryId };
 }
 
-/** Crea o reutiliza el delivery demo vinculado a un pedido pagado. */
-export async function ensureDeliveryForOrder(orderId: string): Promise<string | null> {
+async function createDeliveryForOrder(
+  orderId: string,
+  details?: OrderDeliveryDetails,
+): Promise<string | null> {
   try {
     const existing = await getDeliveryForOrder(orderId);
     if (existing) {
@@ -217,7 +225,9 @@ export async function ensureDeliveryForOrder(orderId: string): Promise<string | 
     }
 
     const driver = await getUserByEmail(DEMO_REPARTIDOR_EMAIL);
-    const dropoff = await getDeviceDeliveryCoords();
+    const dropoff = details
+      ? resolveDropoffFromDetails(details)
+      : await getDeviceDeliveryCoords();
 
     const directions = await getDirections(
       DELIVERY_PICKUP_COORDS.latitude,
@@ -253,10 +263,33 @@ export async function ensureDeliveryForOrder(orderId: string): Promise<string | 
     return delivery.id;
   } catch (err) {
     if (__DEV__) {
-      console.warn('[ensureDeliveryForOrder] falló:', err);
+      console.warn('[createDeliveryForOrder] falló:', err);
     }
     return null;
   }
+}
+
+function resolveDropoffFromDetails(details: OrderDeliveryDetails): DeviceCoords {
+  const addressLabel = formatDeliveryAddress(details);
+
+  if (details.latitude != null && details.longitude != null) {
+    return {
+      latitude: details.latitude,
+      longitude: details.longitude,
+      addressLabel,
+    };
+  }
+
+  return {
+    latitude: MANAGUA_COORDS.latitude,
+    longitude: MANAGUA_COORDS.longitude,
+    addressLabel,
+  };
+}
+
+/** Crea o reutiliza el delivery demo vinculado a un pedido pagado. */
+export async function ensureDeliveryForOrder(orderId: string): Promise<string | null> {
+  return createDeliveryForOrder(orderId);
 }
 
 async function resolveClientName(clientId: string, cache: Map<string, string>): Promise<string> {

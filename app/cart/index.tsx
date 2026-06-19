@@ -1,8 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useRouter, type Href } from 'expo-router';
 import {
-  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -14,9 +12,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useRoleRedirect } from '../../hooks/useRoleRedirect';
-import { formatApiError } from '../../services/api';
-import { checkoutCart } from '../../services/orders';
-import { resolveClientId } from '../../services/serviceRequests';
 import { isCliente } from '../../utils/roles';
 
 export default function CartScreen() {
@@ -24,38 +19,7 @@ export default function CartScreen() {
   const { user } = useAuth();
   useRoleRedirect(isCliente);
 
-  const { lines, subtotal, updateQuantity, removeItem, clearCart, cartCompanyName } =
-    useCart();
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleCheckout = async () => {
-    if (!user || lines.length === 0) {
-      return;
-    }
-
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      const clientId = await resolveClientId(user);
-      const { order, deliveryId } = await checkoutCart(clientId, lines);
-      await clearCart();
-      router.replace({
-        pathname: '/order/[id]',
-        params: {
-          id: order.id,
-          total: order.total,
-          status: order.status,
-          deliveryId: deliveryId ?? '',
-        },
-      });
-    } catch (err) {
-      setError(formatApiError(err, 'No se pudo confirmar el pedido'));
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const { lines, subtotal, updateQuantity, removeItem, cartCompanyName } = useCart();
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
@@ -70,7 +34,7 @@ export default function CartScreen() {
           </Pressable>
           <Text className="text-lg font-black text-[#0F172A]">Mi carrito</Text>
           {cartCompanyName ? (
-            <Text className="text-xs text-[#94A3B8]">{cartCompanyName}</Text>
+            <Text className="ml-2 text-xs text-[#94A3B8]">{cartCompanyName}</Text>
           ) : null}
         </View>
 
@@ -141,19 +105,12 @@ export default function CartScreen() {
                   ${subtotal.toFixed(2)}
                 </Text>
               </View>
-              {error ? (
-                <Text className="mb-3 text-center text-sm text-red-600">{error}</Text>
-              ) : null}
               <Pressable
                 className="items-center rounded-xl bg-[#00A878] py-4"
-                onPress={() => void handleCheckout()}
-                disabled={submitting || lines.length === 0}
+                onPress={() => router.push('/cart/checkout' as Href)}
+                disabled={lines.length === 0}
               >
-                {submitting ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-sm font-bold text-white">Confirmar pedido</Text>
-                )}
+                <Text className="text-sm font-bold text-white">Continuar a entrega</Text>
               </Pressable>
             </View>
           </>

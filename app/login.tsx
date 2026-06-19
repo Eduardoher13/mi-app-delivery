@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -164,6 +164,15 @@ export default function LoginScreen() {
               <Text className="text-sm font-bold text-white">Iniciar sesión</Text>
             )}
           </Pressable>
+
+          <View className="mt-5 flex-row flex-wrap items-center justify-center">
+            <Text className="text-sm text-[#94A3B8]">¿No tienes una cuenta? </Text>
+            <Link href="/register" asChild>
+              <Pressable hitSlop={8}>
+                <Text className="text-sm font-bold text-[#00A878]">Regístrate aquí</Text>
+              </Pressable>
+            </Link>
+          </View>
 
           <Text className="mb-3 mt-8 text-xs font-semibold tracking-widest text-[#94A3B8]">
             ACCESOS RÁPIDOS DEMO

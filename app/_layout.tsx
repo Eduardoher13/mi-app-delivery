@@ -18,6 +18,7 @@ export default function RootLayout() {
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="index" />
               <Stack.Screen name="login" />
+              <Stack.Screen name="register" />
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="professional/[id]" />
               <Stack.Screen name="service-request/new" />
@@ -25,6 +26,7 @@ export default function RootLayout() {
               <Stack.Screen name="service-requests/index" />
               <Stack.Screen name="pro-request/[id]" />
               <Stack.Screen name="cart/index" />
+              <Stack.Screen name="cart/checkout" />
               <Stack.Screen name="store/[companyId]" />
               <Stack.Screen name="order/[id]" />
               <Stack.Screen name="orders/index" />

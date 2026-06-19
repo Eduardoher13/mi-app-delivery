@@ -6,8 +6,10 @@ import { AUTH_TOKEN_KEY } from '../utils/constants';
 
 export { getApiStatus, resolveApiBaseUrl };
 
+const API_TIMEOUT_MS = __DEV__ ? 15000 : 90000;
+
 export const api: AxiosInstance = axios.create({
-  timeout: 15000,
+  timeout: API_TIMEOUT_MS,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -34,13 +36,23 @@ export function formatApiError(error: unknown, fallback = 'Error de conexión'):
   const baseURL = resolveApiBaseUrl();
 
   if (error.code === 'ECONNABORTED') {
-    return `Timeout al conectar con ${baseURL}`;
+    const coldStartHint = baseURL.startsWith('https://')
+      ? ' El servidor en Render puede tardar ~1 min en despertar; intenta de nuevo.'
+      : '';
+    return `Timeout al conectar con ${baseURL}.${coldStartHint}`;
   }
 
   if (error.message === 'Network Error' || !error.response) {
+    if (baseURL.startsWith('https://')) {
+      return (
+        `No se alcanza el backend en ${baseURL}. ` +
+        'Comprueba datos móviles/WiFi. Si el servidor está dormido, espera un minuto e intenta otra vez.'
+      );
+    }
+
     return (
       `No se alcanza el backend en ${baseURL}. ` +
-      'En el Honor: misma WiFi que la Mac, abre Chrome → esa URL. Reinicia Metro con --clear.'
+      'Misma WiFi que la Mac, abre esa URL en el navegador del teléfono. Reinicia Metro con --clear.'
     );
   }
 
