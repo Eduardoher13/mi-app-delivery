@@ -23,7 +23,7 @@ import { resolveClientId } from '../../services/serviceRequests';
 import { OrderDeliveryDetails } from '../../types/checkout';
 import { MANAGUA_COORDS } from '../../utils/constants';
 import { getFastMapCoords, warmUpDeviceLocation } from '../../utils/deviceLocation';
-import { isValidAppPhone } from '../../utils/phoneFormat';
+import { getPhoneValidationMessage, isValidAppPhone } from '../../utils/phoneFormat';
 import { isCliente } from '../../utils/roles';
 
 export default function CartCheckoutScreen() {
@@ -113,7 +113,7 @@ export default function CartCheckoutScreen() {
     }
 
     if (!phone.trim() || !isValidAppPhone(phone)) {
-      setValidationError('Ingresa un teléfono válido de 8 dígitos (ej: 8888 8888).');
+      setValidationError(getPhoneValidationMessage());
       return false;
     }
 
@@ -223,9 +223,6 @@ export default function CartCheckoutScreen() {
               TELÉFONO
             </Text>
             <PhoneInput value={phone} onChangeValue={setPhone} />
-            <Text className="mt-1 text-[10px] text-[#94A3B8]">
-              8 dígitos · formato 8888 8888
-            </Text>
 
             <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
               DIRECCIÓN DE ENTREGA

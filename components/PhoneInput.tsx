@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { CountryCode as LibCountryCode } from 'libphonenumber-js';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import CountryPicker, {
   Country,
@@ -12,6 +12,9 @@ import {
   buildE164Phone,
   DEFAULT_PHONE_COUNTRY,
   formatLocalPhoneDisplay,
+  getDisplayMaxLength,
+  getNationalDigitLimit,
+  getPhonePlaceholder,
   parseStoredPhone,
   sanitizeLocalPhoneDigits,
 } from '../utils/phoneFormat';
@@ -31,12 +34,25 @@ export function PhoneInput({
   value,
   onChangeValue,
   defaultCountryCode = DEFAULT_PHONE_COUNTRY as CountryCode,
-  placeholder = '8888 8888',
+  placeholder,
 }: PhoneInputProps) {
   const [countryCode, setCountryCode] = useState<CountryCode>(defaultCountryCode);
   const [callingCode, setCallingCode] = useState('505');
   const [localDisplay, setLocalDisplay] = useState('');
   const [pickerVisible, setPickerVisible] = useState(false);
+
+  const digitLimit = useMemo(
+    () => getNationalDigitLimit(toLibCountryCode(countryCode)),
+    [countryCode],
+  );
+  const displayMaxLength = useMemo(
+    () => getDisplayMaxLength(toLibCountryCode(countryCode)),
+    [countryCode],
+  );
+  const resolvedPlaceholder = useMemo(
+    () => placeholder ?? getPhonePlaceholder(toLibCountryCode(countryCode)),
+    [countryCode, placeholder],
+  );
 
   useEffect(() => {
     if (!value.trim()) {
@@ -56,59 +72,66 @@ export function PhoneInput({
 
   const syncPhoneValue = useCallback(
     (nextCountryCode: CountryCode, digits: string) => {
-      const formatted = formatLocalPhoneDisplay(digits);
+      const libCode = toLibCountryCode(nextCountryCode);
+      const limit = getNationalDigitLimit(libCode);
+      const clean = sanitizeLocalPhoneDigits(digits, limit);
+      const formatted = formatLocalPhoneDisplay(clean);
       setLocalDisplay(formatted);
-      onChangeValue(buildE164Phone(toLibCountryCode(nextCountryCode), digits));
+      onChangeValue(buildE164Phone(libCode, clean));
     },
     [onChangeValue],
   );
 
   const handleLocalChange = (text: string) => {
-    const digits = sanitizeLocalPhoneDigits(text);
-    syncPhoneValue(countryCode, digits);
+    syncPhoneValue(countryCode, text);
   };
 
   const handleSelectCountry = (country: Country) => {
     const nextCountryCode = country.cca2;
     setCountryCode(nextCountryCode);
     setCallingCode(country.callingCode[0] ?? callingCode);
-    syncPhoneValue(nextCountryCode, sanitizeLocalPhoneDigits(localDisplay));
+    syncPhoneValue(nextCountryCode, sanitizeLocalPhoneDigits(localDisplay, digitLimit));
     setPickerVisible(false);
   };
 
   return (
-    <View className="flex-row overflow-hidden rounded-xl border border-[#E2E8F0] bg-white">
-      <CountryPicker
-        countryCode={countryCode}
-        withFilter
-        withFlag
-        withCallingCode={false}
-        withEmoji
-        onSelect={handleSelectCountry}
-        visible={pickerVisible}
-        onClose={() => setPickerVisible(false)}
-      />
+    <View>
+      <View className="flex-row overflow-hidden rounded-xl border border-[#E2E8F0] bg-white">
+        <CountryPicker
+          countryCode={countryCode}
+          withFilter
+          withFlag
+          withCallingCode={false}
+          withEmoji
+          onSelect={handleSelectCountry}
+          visible={pickerVisible}
+          onClose={() => setPickerVisible(false)}
+        />
 
-      <Pressable
-        className="flex-row items-center border-r border-[#E2E8F0] px-3 py-3"
-        onPress={() => setPickerVisible(true)}
-        hitSlop={4}
-      >
-        <Flag countryCode={countryCode} withEmoji flagSize={18} />
-        <Text className="ml-2 text-sm font-semibold text-[#0F172A]">+{callingCode}</Text>
-        <Ionicons name="chevron-down" size={14} color="#94A3B8" style={{ marginLeft: 4 }} />
-      </Pressable>
+        <Pressable
+          className="flex-row items-center border-r border-[#E2E8F0] px-3 py-3"
+          onPress={() => setPickerVisible(true)}
+          hitSlop={4}
+        >
+          <Flag countryCode={countryCode} withEmoji flagSize={18} />
+          <Text className="ml-2 text-sm font-semibold text-[#0F172A]">+{callingCode}</Text>
+          <Ionicons name="chevron-down" size={14} color="#94A3B8" style={{ marginLeft: 4 }} />
+        </Pressable>
 
-      <TextInput
-        className="flex-1 px-3 py-3 text-sm text-[#0F172A]"
-        placeholder={placeholder}
-        placeholderTextColor="#94A3B8"
-        value={localDisplay}
-        onChangeText={handleLocalChange}
-        keyboardType="number-pad"
-        maxLength={9}
-        returnKeyType="done"
-      />
+        <TextInput
+          className="flex-1 px-3 py-3 text-sm text-[#0F172A]"
+          placeholder={resolvedPlaceholder}
+          placeholderTextColor="#94A3B8"
+          value={localDisplay}
+          onChangeText={handleLocalChange}
+          keyboardType="number-pad"
+          maxLength={displayMaxLength}
+          returnKeyType="done"
+        />
+      </View>
+      <Text className="mt-1 text-[10px] text-[#94A3B8]">
+        {digitLimit} dígitos para este país · espacio cada 4
+      </Text>
     </View>
   );
 }

@@ -17,7 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { PhoneInput } from '../components/PhoneInput';
 import { formatApiError } from '../services/api';
 import { getDefaultTabHref } from '../utils/roles';
-import { isOptionalPhoneValid } from '../utils/phoneFormat';
+import { isOptionalPhoneValid, getPhoneValidationMessage } from '../utils/phoneFormat';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export default function RegisterScreen() {
     }
 
     if (!isOptionalPhoneValid(phone)) {
-      setError('Ingresa un teléfono válido de 8 dígitos (ej: 8888 8888).');
+      setError(getPhoneValidationMessage());
       return;
     }
 
@@ -167,9 +167,6 @@ export default function RegisterScreen() {
             TELÉFONO (OPCIONAL)
           </Text>
           <PhoneInput value={phone} onChangeValue={setPhone} />
-          <Text className="mt-1 text-[10px] text-[#94A3B8]">
-            8 dígitos · formato 8888 8888
-          </Text>
 
           <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
             CIUDAD (OPCIONAL)
