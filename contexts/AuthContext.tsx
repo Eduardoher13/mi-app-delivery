@@ -14,6 +14,7 @@ import {
   login as apiLogin,
   mapAuthUserToUser,
 } from '../services/auth';
+import { updateUser } from '../services/users';
 import { User } from '../types';
 import {
   AUTH_TOKEN_KEY,
@@ -144,6 +145,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (avatarUrl: string) => {
       if (!user) {
         return;
+      }
+
+      try {
+        await updateUser(user.id, { avatar_url: avatarUrl });
+      } catch {
+        // Si falla el backend, al menos reflejamos el cambio en la sesión local.
       }
 
       const nextUser = { ...user, avatarUrl };

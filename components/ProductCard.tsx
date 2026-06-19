@@ -19,16 +19,26 @@ export function ProductCard({
   const outOfStock = product.stock !== undefined && product.stock <= 0;
 
   return (
-    <View className="mr-3 flex-1 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white">
-      <Pressable onPress={() => onPress?.(product)}>
+    <View className="h-full flex-1 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white">
+      <Pressable className="flex-1" onPress={() => onPress?.(product)}>
         <Image
           source={{ uri: product.imageUrl }}
           style={{ width: '100%', height: 128 }}
           resizeMode="cover"
         />
-        <View className="p-3 pb-2">
-          <Text className="text-xs text-[#94A3B8]">{product.category}</Text>
-          <Text className="mt-1 text-sm font-bold text-[#0F172A]" numberOfLines={2}>
+        <View className="flex-1 p-3 pb-2">
+          <Text
+            className="text-xs leading-4 text-[#94A3B8]"
+            numberOfLines={2}
+            style={{ minHeight: 32 }}
+          >
+            {product.category}
+          </Text>
+          <Text
+            className="mt-1 text-sm font-bold leading-5 text-[#0F172A]"
+            numberOfLines={2}
+            style={{ minHeight: 40 }}
+          >
             {product.name}
           </Text>
           <Text className="mt-2 text-base font-bold text-[#00A878]">

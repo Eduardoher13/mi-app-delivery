@@ -167,7 +167,7 @@ export default function CompanyStoreScreen() {
               />
             }
           >
-            <View className="flex-row flex-wrap">
+            <View className="flex-row flex-wrap items-stretch">
               {products.map((product) => (
                 <View key={product.id} className="mb-3 w-1/2 pr-2">
                   <ProductCard

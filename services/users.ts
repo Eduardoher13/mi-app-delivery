@@ -24,3 +24,11 @@ export async function getUserById(id: string): Promise<ApiUser> {
 export function formatUserName(user: Pick<ApiUser, 'first_name' | 'last_name'>): string {
   return `${user.first_name} ${user.last_name}`.trim() || 'Cliente';
 }
+
+export async function updateUser(
+  id: string,
+  dto: Partial<Pick<ApiUser, 'avatar_url' | 'first_name' | 'last_name'>>,
+): Promise<ApiUser> {
+  const { data } = await api.patch<ApiUser>(`/users/${id}`, dto);
+  return data;
+}

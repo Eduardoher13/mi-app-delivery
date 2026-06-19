@@ -193,7 +193,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Promo banner */}
-          <BannerPromo />
+          <BannerPromo onPress={() => goToProducts()} />
 
           {loading ? (
             <View className="my-10 items-center justify-center">
@@ -243,7 +243,7 @@ export default function HomeScreen() {
                   No hay productos recomendados en este momento.
                 </Text>
               ) : (
-                <View className="flex-row flex-wrap">
+                <View className="flex-row flex-wrap items-stretch">
                   {recommendedProducts.map((product) => (
                     <View key={product.id} className="mb-3 w-1/2 pr-2">
                       <ProductCard
