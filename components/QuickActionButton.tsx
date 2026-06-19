@@ -18,7 +18,7 @@ export function QuickActionButton({
     <Pressable
       className={`mr-3 flex-1 items-center justify-center rounded-xl px-3 py-4 ${
         isEmergency || isPrimary
-          ? 'bg-[#00A878]'
+          ? 'bg-[#1e3a8a]'
           : 'border border-[#E2E8F0] bg-white'
       }`}
       onPress={onPress}

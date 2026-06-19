@@ -126,7 +126,7 @@ export default function HomeScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => void loadHomeData(true)}
-              tintColor="#00A878"
+              tintColor="#1e3a8a"
             />
           }
         >
@@ -136,7 +136,7 @@ export default function HomeScreen() {
               <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
                 BIENVENIDO
               </Text>
-              <Text className="text-2xl font-black italic text-[#00A878]">
+              <Text className="text-2xl font-black italic text-[#1e3a8a]">
                 Listo!
               </Text>
             </View>
@@ -203,7 +203,7 @@ export default function HomeScreen() {
 
           {loading ? (
             <View className="my-10 items-center justify-center">
-              <ActivityIndicator color="#00A878" size="large" />
+              <ActivityIndicator color="#1e3a8a" size="large" />
             </View>
           ) : error ? (
             <View className="my-10 items-center justify-center px-4">
@@ -217,7 +217,7 @@ export default function HomeScreen() {
                   SERVICIOS DESTACADOS
                 </Text>
                 <Pressable onPress={() => goToServices()} hitSlop={8}>
-                  <Text className="text-xs font-semibold text-[#00A878]">Ver todos</Text>
+                  <Text className="text-xs font-semibold text-[#1e3a8a]">Ver todos</Text>
                 </Pressable>
               </View>
               {featuredServices.length === 0 ? (

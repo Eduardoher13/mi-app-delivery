@@ -1,4 +1,5 @@
 import * as Location from 'expo-location';
+import { Platform } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 
 import { MANAGUA_COORDS } from '../utils/constants';
@@ -28,13 +29,24 @@ export function useLocation(): UseLocationResult {
     setError(null);
 
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Permiso de ubicación denegado');
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && !window.isSecureContext) {
+        setError('La ubicación requiere HTTPS en Safari.');
         return;
       }
 
-      const location = await Location.getCurrentPositionAsync({});
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError(
+          Platform.OS === 'web'
+            ? 'Permiso de ubicación denegado. Revisa Ajustes → Safari → Ubicación.'
+            : 'Permiso de ubicación denegado',
+        );
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Platform.OS === 'web' ? Location.Accuracy.Balanced : Location.Accuracy.Lowest,
+      });
       setCoords({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,

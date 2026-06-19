@@ -73,6 +73,9 @@ module.exports = ({ config }) => ({
   web: {
     favicon: './assets/icon.png',
     bundler: 'metro',
+    meta: {
+      viewport: 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover',
+    },
   },
   plugins: [
     [

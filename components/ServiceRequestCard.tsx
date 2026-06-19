@@ -19,7 +19,7 @@ function StarRating({ rating }: { rating: number }) {
           key={index}
           name={filled ? 'star' : 'star-outline'}
           size={14}
-          color="#00A878"
+          color="#1e3a8a"
         />
       ))}
       <Text className="ml-1 text-xs font-semibold text-[#0F172A]">{rating}</Text>
@@ -47,11 +47,11 @@ export function ServiceRequestCard({ service, onPress }: ServiceRequestCardProps
         </View>
       </Pressable>
       <View className="flex-row items-center justify-between px-3 pb-3">
-        <Text className="text-sm font-bold text-[#00A878]">
+        <Text className="text-sm font-bold text-[#1e3a8a]">
           ${service.price}/hr
         </Text>
         <Pressable
-          className="rounded-lg bg-[#00A878] px-3 py-1.5"
+          className="rounded-lg bg-[#1e3a8a] px-3 py-1.5"
           onPress={handlePress}
         >
           <Text className="text-xs font-bold text-white">Ver oferta</Text>

@@ -1,8 +1,9 @@
+/** Paleta Listo!: navy + blanco */
 export const colors = {
-  accent: '#00A878',
-  navy: '#0F172A',
+  navy: '#1e3a8a',
+  navyDark: '#0f172a',
+  accent: '#1e3a8a',
   white: '#FFFFFF',
-  charcoal: '#1A202C',
   neutral: '#E2E8F0',
   placeholder: '#94A3B8',
 } as const;

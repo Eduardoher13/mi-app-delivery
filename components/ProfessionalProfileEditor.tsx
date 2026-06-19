@@ -81,7 +81,7 @@ export function ProfessionalProfileEditor({ userId }: ProfessionalProfileEditorP
   if (loading) {
     return (
       <View className="mt-6 items-center rounded-2xl border border-[#E2E8F0] p-6">
-        <ActivityIndicator color="#00A878" />
+        <ActivityIndicator color="#1e3a8a" />
       </View>
     );
   }
@@ -120,18 +120,18 @@ export function ProfessionalProfileEditor({ userId }: ProfessionalProfileEditorP
         <Switch
           value={isAvailable}
           onValueChange={setIsAvailable}
-          trackColor={{ false: '#E2E8F0', true: '#00A878' }}
+          trackColor={{ false: '#E2E8F0', true: '#1e3a8a' }}
           thumbColor="#FFFFFF"
         />
       </View>
 
       {error ? <Text className="mt-3 text-center text-xs text-red-600">{error}</Text> : null}
       {success ? (
-        <Text className="mt-3 text-center text-xs text-[#00A878]">{success}</Text>
+        <Text className="mt-3 text-center text-xs text-[#1e3a8a]">{success}</Text>
       ) : null}
 
       <Pressable
-        className="mt-4 items-center rounded-xl bg-[#00A878] py-3"
+        className="mt-4 items-center rounded-xl bg-[#1e3a8a] py-3"
         onPress={() => void handleSave()}
         disabled={saving}
       >

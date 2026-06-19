@@ -31,7 +31,7 @@ export function ServiceRequestFilterChips({
             key={filter.key}
             className={`mr-2 rounded-full border px-3 py-1 ${
               selected
-                ? 'border-[#00A878] bg-[#00A878]'
+                ? 'border-[#1e3a8a] bg-[#1e3a8a]'
                 : 'border-[#E2E8F0] bg-white'
             }`}
             onPress={() => onChange(filter.key)}

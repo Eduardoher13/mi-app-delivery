@@ -188,7 +188,7 @@ export default function DeliveryTrackingScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#00A878" size="large" />
+          <ActivityIndicator color="#1e3a8a" size="large" />
         </View>
       ) : error || !delivery ? (
         <View className="flex-1 items-center justify-center px-6">
@@ -215,12 +215,12 @@ export default function DeliveryTrackingScreen() {
               </Text>
               <View
                 className={`rounded-full px-3 py-1 ${
-                  isDelivered ? 'bg-[#00A878]/10' : 'bg-[#2563EB]/10'
+                  isDelivered ? 'bg-[#1e3a8a]/10' : 'bg-[#1e3a8a]/10'
                 }`}
               >
                 <Text
                   className={`text-xs font-bold ${
-                    isDelivered ? 'text-[#00A878]' : 'text-[#2563EB]'
+                    isDelivered ? 'text-[#1e3a8a]' : 'text-[#1e3a8a]'
                   }`}
                 >
                   {statusLabel(delivery.status)}
@@ -229,7 +229,7 @@ export default function DeliveryTrackingScreen() {
             </View>
 
             <View className="mt-3 flex-row items-start">
-              <Ionicons name="storefront-outline" size={16} color="#00A878" />
+              <Ionicons name="storefront-outline" size={16} color="#1e3a8a" />
               <Text className="ml-2 flex-1 text-sm text-[#0F172A]" numberOfLines={1}>
                 {delivery.pickup_address}
               </Text>
@@ -251,7 +251,7 @@ export default function DeliveryTrackingScreen() {
             {!isDelivered ? (
               <View className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#E2E8F0]">
                 <View
-                  className="h-full rounded-full bg-[#00A878]"
+                  className="h-full rounded-full bg-[#1e3a8a]"
                   style={{ width: `${Math.round((arrived ? 1 : progress) * 100)}%` }}
                 />
               </View>
@@ -259,7 +259,7 @@ export default function DeliveryTrackingScreen() {
 
             {!isDelivered ? (
               <Pressable
-                className="mt-4 items-center rounded-xl bg-[#00A878] py-4"
+                className="mt-4 items-center rounded-xl bg-[#1e3a8a] py-4"
                 onPress={() => void handleComplete()}
                 disabled={completing}
               >
@@ -272,9 +272,9 @@ export default function DeliveryTrackingScreen() {
                 )}
               </Pressable>
             ) : (
-              <View className="mt-4 flex-row items-center justify-center rounded-xl bg-[#00A878]/10 py-4">
-                <Ionicons name="checkmark-circle" size={18} color="#00A878" />
-                <Text className="ml-2 text-sm font-bold text-[#00A878]">
+              <View className="mt-4 flex-row items-center justify-center rounded-xl bg-[#1e3a8a]/10 py-4">
+                <Ionicons name="checkmark-circle" size={18} color="#1e3a8a" />
+                <Text className="ml-2 text-sm font-bold text-[#1e3a8a]">
                   Entrega completada
                 </Text>
               </View>

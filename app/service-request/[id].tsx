@@ -163,7 +163,7 @@ export default function ServiceRequestDetailScreen() {
 
         {loading ? (
           <View className="my-10 items-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : error ? (
           <Text className="my-10 text-center text-sm text-red-600">{error}</Text>
@@ -180,7 +180,7 @@ export default function ServiceRequestDetailScreen() {
               ) : null}
             </View>
 
-            <Text className="mt-2 text-sm font-semibold text-[#00A878]">
+            <Text className="mt-2 text-sm font-semibold text-[#1e3a8a]">
               {serviceRequestStatusLabel(request.status)}
             </Text>
             <Text className="mt-1 text-xs text-[#94A3B8]">
@@ -215,14 +215,14 @@ export default function ServiceRequestDetailScreen() {
                 {proName ? (
                   <Text className="mt-2 text-sm font-bold text-[#0F172A]">{proName}</Text>
                 ) : null}
-                <Text className="mt-2 text-2xl font-black text-[#00A878]">
+                <Text className="mt-2 text-2xl font-black text-[#1e3a8a]">
                   ${parseOfferPrice(displayOffer.price).toFixed(2)}
                 </Text>
                 {displayOffer.message ? (
                   <Text className="mt-2 text-sm text-[#0F172A]">{displayOffer.message}</Text>
                 ) : null}
                 {displayOffer.is_accepted ? (
-                  <Text className="mt-3 text-xs font-semibold text-[#00A878]">
+                  <Text className="mt-3 text-xs font-semibold text-[#1e3a8a]">
                     Cotización aceptada
                   </Text>
                 ) : null}
@@ -236,8 +236,8 @@ export default function ServiceRequestDetailScreen() {
             ) : null}
 
             {successMessage ? (
-              <View className="mt-4 rounded-lg bg-[#00A878]/10 px-3 py-3">
-                <Text className="text-center text-sm font-semibold text-[#00A878]">
+              <View className="mt-4 rounded-lg bg-[#1e3a8a]/10 px-3 py-3">
+                <Text className="text-center text-sm font-semibold text-[#1e3a8a]">
                   {successMessage}
                 </Text>
               </View>
@@ -249,7 +249,7 @@ export default function ServiceRequestDetailScreen() {
 
             {canAccept && pendingOffer ? (
               <Pressable
-                className="mt-6 items-center rounded-xl bg-[#00A878] py-4"
+                className="mt-6 items-center rounded-xl bg-[#1e3a8a] py-4"
                 onPress={() => void handleAcceptOffer(pendingOffer)}
                 disabled={accepting}
               >

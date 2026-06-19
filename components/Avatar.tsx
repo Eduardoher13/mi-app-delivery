@@ -30,7 +30,7 @@ export function Avatar({ name, avatarUrl, size = 80 }: AvatarProps) {
 
   return (
     <View
-      className="items-center justify-center rounded-full bg-[#00A878]"
+      className="items-center justify-center rounded-full bg-[#1e3a8a]"
       style={{ width: size, height: size }}
     >
       <Text className="font-bold text-white" style={{ fontSize: size * 0.3 }}>

@@ -15,10 +15,10 @@ function StepIcon({ step }: { step: TimelineStep }) {
     return <Ionicons name="close-circle" size={20} color="#94A3B8" />;
   }
   if (step.state === 'done') {
-    return <Ionicons name="checkmark-circle" size={20} color="#00A878" />;
+    return <Ionicons name="checkmark-circle" size={20} color="#1e3a8a" />;
   }
   if (step.state === 'current') {
-    return <View className="h-5 w-5 items-center justify-center rounded-full bg-[#00A878]">
+    return <View className="h-5 w-5 items-center justify-center rounded-full bg-[#1e3a8a]">
       <View className="h-2 w-2 rounded-full bg-white" />
     </View>;
   }
@@ -47,7 +47,7 @@ export function ServiceRequestTimeline({ status }: ServiceRequestTimelineProps) 
               {index < steps.length - 1 ? (
                 <View
                   className={`my-1 w-0.5 flex-1 min-h-[24px] ${
-                    step.state === 'done' ? 'bg-[#00A878]' : 'bg-[#E2E8F0]'
+                    step.state === 'done' ? 'bg-[#1e3a8a]' : 'bg-[#E2E8F0]'
                   }`}
                 />
               ) : null}
@@ -56,7 +56,7 @@ export function ServiceRequestTimeline({ status }: ServiceRequestTimelineProps) 
               <Text
                 className={`text-sm font-semibold ${
                   step.state === 'current'
-                    ? 'text-[#00A878]'
+                    ? 'text-[#1e3a8a]'
                     : step.state === 'done'
                       ? 'text-[#0F172A]'
                       : 'text-[#94A3B8]'

@@ -182,8 +182,8 @@ export default function NewServiceRequestScreen() {
     return (
       <SafeAreaView className="flex-1 bg-white" edges={['top']}>
         <View className="flex-1 items-center justify-center px-6">
-          <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-[#00A878]/10">
-            <Ionicons name="checkmark-circle" size={48} color="#00A878" />
+          <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-[#1e3a8a]/10">
+            <Ionicons name="checkmark-circle" size={48} color="#1e3a8a" />
           </View>
           <Text className="text-center text-xl font-black text-[#0F172A]">
             Solicitud enviada
@@ -192,7 +192,7 @@ export default function NewServiceRequestScreen() {
             Tu solicitud fue registrada correctamente. Un profesional podrá revisarla pronto.
           </Text>
           <Pressable
-            className="mt-8 w-full items-center rounded-xl bg-[#00A878] py-4"
+            className="mt-8 w-full items-center rounded-xl bg-[#1e3a8a] py-4"
             onPress={() => router.replace('/service-requests')}
           >
             <Text className="text-sm font-bold text-white">Ver mis solicitudes</Text>
@@ -252,7 +252,7 @@ export default function NewServiceRequestScreen() {
                 key={category.id}
                 className={`mb-2 mr-2 rounded-full border px-4 py-2 ${
                   selected
-                    ? 'border-[#00A878] bg-[#00A878]'
+                    ? 'border-[#1e3a8a] bg-[#1e3a8a]'
                     : locked
                       ? 'border-[#E2E8F0] bg-[#F8FAFC] opacity-50'
                       : 'border-[#E2E8F0] bg-white'
@@ -315,7 +315,7 @@ export default function NewServiceRequestScreen() {
           className="mt-2 self-start rounded-lg border border-[#E2E8F0] px-3 py-2"
           onPress={() => void handleUseLocation()}
         >
-          <Text className="text-xs font-bold text-[#00A878]">Usar mi ubicación</Text>
+          <Text className="text-xs font-bold text-[#1e3a8a]">Usar mi ubicación</Text>
         </Pressable>
 
         <View className="mt-6 flex-row items-center justify-between rounded-xl border border-[#E2E8F0] px-4 py-3">
@@ -326,7 +326,7 @@ export default function NewServiceRequestScreen() {
           <Switch
             value={isEmergency}
             onValueChange={setIsEmergency}
-            trackColor={{ false: '#E2E8F0', true: '#00A878' }}
+            trackColor={{ false: '#E2E8F0', true: '#1e3a8a' }}
             thumbColor="#FFFFFF"
           />
         </View>
@@ -351,7 +351,7 @@ export default function NewServiceRequestScreen() {
         ) : null}
 
         <Pressable
-          className="mt-6 items-center rounded-xl bg-[#00A878] py-4"
+          className="mt-6 items-center rounded-xl bg-[#1e3a8a] py-4"
           onPress={() => void handleSubmit()}
           disabled={submitting}
         >

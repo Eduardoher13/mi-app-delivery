@@ -92,7 +92,7 @@ export default function ServiceRequestsScreen() {
             <Text className="text-lg font-black text-[#0F172A]">Mis solicitudes</Text>
           </View>
           <Pressable
-            className="rounded-lg bg-[#00A878] px-3 py-2"
+            className="rounded-lg bg-[#1e3a8a] px-3 py-2"
             onPress={() => goToNewServiceRequest(router)}
           >
             <Text className="text-xs font-bold text-white">Nueva</Text>
@@ -101,7 +101,7 @@ export default function ServiceRequestsScreen() {
 
         {loading ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-4">
@@ -113,7 +113,7 @@ export default function ServiceRequestsScreen() {
               Aún no tienes solicitudes de servicio.
             </Text>
             <Pressable
-              className="mt-4 rounded-xl bg-[#00A878] px-6 py-3"
+              className="mt-4 rounded-xl bg-[#1e3a8a] px-6 py-3"
               onPress={() => goToNewServiceRequest(router)}
             >
               <Text className="text-sm font-bold text-white">Crear solicitud</Text>
@@ -127,7 +127,7 @@ export default function ServiceRequestsScreen() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={() => void loadRequests(true)}
-                tintColor="#00A878"
+                tintColor="#1e3a8a"
               />
             }
           >
@@ -156,7 +156,7 @@ export default function ServiceRequestsScreen() {
                   {request.description}
                 </Text>
                 <View className="mt-3 flex-row items-center justify-between">
-                  <Text className="text-xs font-semibold text-[#00A878]">
+                  <Text className="text-xs font-semibold text-[#1e3a8a]">
                     {statusLabel(request.status)}
                   </Text>
                   <Text className="text-xs text-[#94A3B8]">

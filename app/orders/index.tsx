@@ -139,7 +139,7 @@ export default function ClientOrdersScreen() {
 
         {loading ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-4">
@@ -159,7 +159,7 @@ export default function ClientOrdersScreen() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={() => void loadOrders(true)}
-                tintColor="#00A878"
+                tintColor="#1e3a8a"
               />
             }
           >
@@ -176,7 +176,7 @@ export default function ClientOrdersScreen() {
                     <Text className="text-sm font-bold text-[#0F172A]">
                       Pedido #{order.id.slice(0, 8)}
                     </Text>
-                    <Text className="text-xs font-semibold text-[#00A878]">
+                    <Text className="text-xs font-semibold text-[#1e3a8a]">
                       {statusLabel(order.status)}
                     </Text>
                   </View>
@@ -190,16 +190,16 @@ export default function ClientOrdersScreen() {
                   </View>
                   {canTrackOrder(order.status) ? (
                     <Pressable
-                      className="mt-3 flex-row items-center justify-center rounded-lg border border-[#00A878] py-2.5"
+                      className="mt-3 flex-row items-center justify-center rounded-lg border border-[#1e3a8a] py-2.5"
                       onPress={() => void openTracking(order)}
                       disabled={ensuringOrderId === order.id}
                     >
                       {ensuringOrderId === order.id ? (
-                        <ActivityIndicator color="#00A878" size="small" />
+                        <ActivityIndicator color="#1e3a8a" size="small" />
                       ) : (
                         <>
-                          <Ionicons name="navigate-outline" size={16} color="#00A878" />
-                          <Text className="ml-2 text-xs font-bold text-[#00A878]">
+                          <Ionicons name="navigate-outline" size={16} color="#1e3a8a" />
+                          <Text className="ml-2 text-xs font-bold text-[#1e3a8a]">
                             {deliveryId ? 'Ver ruta' : 'Seguir entrega'}
                           </Text>
                         </>

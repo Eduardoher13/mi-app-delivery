@@ -30,7 +30,7 @@ export function CategoryGrid({ categories, onCategoryPress }: CategoryGridProps)
             <Ionicons
               name={iconMap[category.icon] ?? 'construct'}
               size={24}
-              color="#0F172A"
+              color="#1e3a8a"
             />
           </View>
           <Text className="text-center text-xs font-bold text-[#0F172A]">

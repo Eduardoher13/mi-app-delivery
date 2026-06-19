@@ -177,7 +177,7 @@ export default function ProRequestDetailScreen() {
 
         {loading ? (
           <View className="my-10 items-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : error ? (
           <Text className="my-10 text-center text-sm text-red-600">{error}</Text>
@@ -194,7 +194,7 @@ export default function ProRequestDetailScreen() {
               ) : null}
             </View>
 
-            <Text className="mt-2 text-sm font-semibold text-[#00A878]">
+            <Text className="mt-2 text-sm font-semibold text-[#1e3a8a]">
               {serviceRequestStatusLabel(request.status)}
             </Text>
             <Text className="mt-1 text-xs text-[#94A3B8]">
@@ -222,8 +222,8 @@ export default function ProRequestDetailScreen() {
             </View>
 
             {myOffer ? (
-              <View className="mt-6 rounded-2xl border border-[#00A878]/30 bg-[#00A878]/5 p-4">
-                <Text className="text-xs font-semibold tracking-widest text-[#00A878]">
+              <View className="mt-6 rounded-2xl border border-[#1e3a8a]/30 bg-[#1e3a8a]/5 p-4">
+                <Text className="text-xs font-semibold tracking-widest text-[#1e3a8a]">
                   TU COTIZACIÓN
                 </Text>
                 <Text className="mt-2 text-2xl font-black text-[#0F172A]">
@@ -262,7 +262,7 @@ export default function ProRequestDetailScreen() {
                   <Text className="mt-3 text-center text-xs text-red-600">{submitError}</Text>
                 ) : null}
                 <Pressable
-                  className="mt-4 items-center rounded-xl bg-[#00A878] py-4"
+                  className="mt-4 items-center rounded-xl bg-[#1e3a8a] py-4"
                   onPress={() => void handleSubmitOffer()}
                   disabled={submitting}
                 >

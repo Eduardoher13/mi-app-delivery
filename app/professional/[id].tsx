@@ -96,7 +96,7 @@ export default function ProfessionalOfferScreen() {
       <ScrollView className="flex-1" contentContainerClassName="pb-28">
         {loading ? (
           <View className="my-10 items-center justify-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : null}
 
@@ -117,7 +117,7 @@ export default function ProfessionalOfferScreen() {
           ) : null}
 
           <View className="mt-4 flex-row items-center">
-            <Ionicons name="star" size={18} color="#00A878" />
+            <Ionicons name="star" size={18} color="#1e3a8a" />
             <Text className="ml-1 text-base font-bold text-[#0F172A]">
               {Number.isFinite(rating) ? rating.toFixed(1) : '—'}
             </Text>
@@ -176,7 +176,7 @@ export default function ProfessionalOfferScreen() {
             <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
               TARIFA ESTIMADA
             </Text>
-            <Text className="mt-1 text-3xl font-black text-[#00A878]">
+            <Text className="mt-1 text-3xl font-black text-[#1e3a8a]">
               ${Number.isFinite(price) ? price.toFixed(2) : '—'}
               <Text className="text-base font-bold text-[#94A3B8]"> / hr</Text>
             </Text>
@@ -186,7 +186,7 @@ export default function ProfessionalOfferScreen() {
 
       <View className="absolute bottom-0 left-0 right-0 border-t border-[#E2E8F0] bg-white px-4 pb-8 pt-4">
         <Pressable
-          className="items-center rounded-xl bg-[#00A878] py-4 shadow-sm"
+          className="items-center rounded-xl bg-[#1e3a8a] py-4 shadow-sm"
           onPress={() =>
             goToNewServiceRequest(router, {
               specialtySlug,

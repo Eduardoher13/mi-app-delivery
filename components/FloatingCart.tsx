@@ -9,12 +9,12 @@ interface FloatingCartProps {
 export function FloatingCart({ itemCount, total, onPress }: FloatingCartProps) {
   return (
     <View className="absolute bottom-24 left-4 right-4 z-50">
-      <View className="flex-row items-center rounded-2xl bg-[#1A202C] px-4 py-3 shadow-lg">
-        <View className="mr-3 h-10 w-10 items-center justify-center rounded-lg bg-[#00A878]">
+      <View className="flex-row items-center rounded-2xl bg-[#1e3a8a] px-4 py-3 shadow-lg">
+        <View className="mr-3 h-10 w-10 items-center justify-center rounded-lg bg-white/20">
           <Text className="text-sm font-bold text-white">{itemCount}</Text>
         </View>
         <View className="flex-1">
-          <Text className="text-[10px] font-semibold tracking-widest text-[#94A3B8]">
+          <Text className="text-[10px] font-semibold tracking-widest text-white/70">
             TOTAL CARRITO
           </Text>
           <Text className="text-lg font-black text-white">
@@ -22,10 +22,10 @@ export function FloatingCart({ itemCount, total, onPress }: FloatingCartProps) {
           </Text>
         </View>
         <Pressable
-          className="rounded-lg bg-[#00A878] px-4 py-2.5"
+          className="rounded-lg bg-white px-4 py-2.5"
           onPress={onPress}
         >
-          <Text className="text-xs font-bold text-white">VER PEDIDO</Text>
+          <Text className="text-xs font-bold text-[#1e3a8a]">VER PEDIDO</Text>
         </Pressable>
       </View>
     </View>

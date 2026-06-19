@@ -41,7 +41,7 @@ export function ProductCard({
           >
             {product.name}
           </Text>
-          <Text className="mt-2 text-base font-bold text-[#00A878]">
+          <Text className="mt-2 text-base font-bold text-[#1e3a8a]">
             ${product.price.toFixed(2)}
           </Text>
         </View>
@@ -50,7 +50,7 @@ export function ProductCard({
         <View className="border-t border-[#E2E8F0] px-3 py-2">
           <Pressable
             className={`flex-row items-center justify-center rounded-lg py-2 ${
-              outOfStock ? 'bg-[#E2E8F0]' : 'bg-[#00A878]'
+              outOfStock ? 'bg-[#E2E8F0]' : 'bg-[#1e3a8a]'
             }`}
             onPress={() => !outOfStock && onAddToCart?.(product)}
             disabled={outOfStock}

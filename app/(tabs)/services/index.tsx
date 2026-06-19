@@ -103,7 +103,7 @@ export default function ServicesScreen() {
           <Pressable
             className={`mr-2 rounded-full border px-3 py-1 ${
               !specialtySlug
-                ? 'border-[#00A878] bg-[#00A878]'
+                ? 'border-[#1e3a8a] bg-[#1e3a8a]'
                 : 'border-[#E2E8F0] bg-white'
             }`}
             onPress={() => handleSelectSlug()}
@@ -124,7 +124,7 @@ export default function ServicesScreen() {
                 key={category.id}
                 className={`mr-2 rounded-full border px-3 py-1 ${
                   selected
-                    ? 'border-[#00A878] bg-[#00A878]'
+                    ? 'border-[#1e3a8a] bg-[#1e3a8a]'
                     : 'border-[#E2E8F0] bg-white'
                 }`}
                 onPress={() => handleSelectSlug(category.slug)}
@@ -143,7 +143,7 @@ export default function ServicesScreen() {
 
         {loading ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-4">
@@ -165,7 +165,7 @@ export default function ServicesScreen() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={() => void loadProfessionals(true)}
-                tintColor="#00A878"
+                tintColor="#1e3a8a"
               />
             }
           >

@@ -131,8 +131,8 @@ export default function CompanyStoreScreen() {
         </View>
 
         {addedMessage ? (
-          <View className="mt-2 rounded-lg bg-[#00A878]/10 px-3 py-2">
-            <Text className="text-center text-xs font-semibold text-[#00A878]">
+          <View className="mt-2 rounded-lg bg-[#1e3a8a]/10 px-3 py-2">
+            <Text className="text-center text-xs font-semibold text-[#1e3a8a]">
               {addedMessage}
             </Text>
           </View>
@@ -140,7 +140,7 @@ export default function CompanyStoreScreen() {
 
         {loading ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-4">
@@ -163,7 +163,7 @@ export default function CompanyStoreScreen() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={() => void loadProducts(true)}
-                tintColor="#00A878"
+                tintColor="#1e3a8a"
               />
             }
           >

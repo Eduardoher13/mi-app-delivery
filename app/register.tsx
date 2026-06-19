@@ -88,7 +88,7 @@ export default function RegisterScreen() {
   if (authLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator color="#00A878" size="large" />
+        <ActivityIndicator color="#1e3a8a" size="large" />
       </View>
     );
   }
@@ -115,7 +115,7 @@ export default function RegisterScreen() {
           <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
             CREAR CUENTA EN
           </Text>
-          <Text className="text-3xl font-black italic text-[#00A878]">Listo!</Text>
+          <Text className="text-3xl font-black italic text-[#1e3a8a]">Listo!</Text>
           <Text className="mt-2 text-sm text-[#94A3B8]">
             Regístrate como cliente para solicitar servicios y comprar materiales
           </Text>
@@ -211,7 +211,7 @@ export default function RegisterScreen() {
           ) : null}
 
           <Pressable
-            className="mt-6 items-center rounded-xl bg-[#00A878] py-4"
+            className="mt-6 items-center rounded-xl bg-[#1e3a8a] py-4"
             onPress={() => void handleRegister()}
             disabled={submitting}
           >
@@ -226,7 +226,7 @@ export default function RegisterScreen() {
             <Text className="text-sm text-[#94A3B8]">¿Ya tienes una cuenta? </Text>
             <Link href="/login" asChild>
               <Pressable hitSlop={8}>
-                <Text className="text-sm font-bold text-[#00A878]">Inicia sesión aquí</Text>
+                <Text className="text-sm font-bold text-[#1e3a8a]">Inicia sesión aquí</Text>
               </Pressable>
             </Link>
           </View>

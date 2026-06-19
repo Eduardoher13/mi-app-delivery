@@ -1,12 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import { Platform } from 'react-native';
 
-import { getApiStatus, resolveApiBaseUrl } from '../utils/apiBaseUrl';
+import { getApiStatus, getApiTimeoutMs, resolveApiBaseUrl } from '../utils/apiBaseUrl';
 import { AUTH_TOKEN_KEY } from '../utils/constants';
 
 export { getApiStatus, resolveApiBaseUrl };
 
-const API_TIMEOUT_MS = __DEV__ ? 15000 : 90000;
+const API_TIMEOUT_MS = getApiTimeoutMs();
 
 export const api: AxiosInstance = axios.create({
   timeout: API_TIMEOUT_MS,
@@ -42,17 +43,23 @@ export function formatApiError(error: unknown, fallback = 'Error de conexión'):
     return `Timeout al conectar con ${baseURL}.${coldStartHint}`;
   }
 
-  if (error.message === 'Network Error' || !error.response) {
+    if (error.message === 'Network Error' || !error.response) {
     if (baseURL.startsWith('https://')) {
       return (
         `No se alcanza el backend en ${baseURL}. ` +
-        'Comprueba datos móviles/WiFi. Si el servidor está dormido, espera un minuto e intenta otra vez.'
+        'Comprueba datos/WiFi. Si el servidor en Render está dormido, espera ~1 min e intenta otra vez.'
       );
     }
 
+    const webHint =
+      Platform.OS === 'web'
+        ? ' En web usa EXPO_PUBLIC_API_BASE_URL en .env (p. ej. Render).'
+        : '';
+
     return (
-      `No se alcanza el backend en ${baseURL}. ` +
-      'Misma WiFi que la Mac, abre esa URL en el navegador del teléfono. Reinicia Metro con --clear.'
+      `No se alcanza el backend en ${baseURL}.` +
+      webHint +
+      ' Misma WiFi que la Mac, o reinicia Metro con --clear.'
     );
   }
 

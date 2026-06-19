@@ -74,8 +74,8 @@ export default function OrderSuccessScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <View className="flex-1 items-center justify-center px-6">
-        <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-[#00A878]/10">
-          <Ionicons name="checkmark-circle" size={48} color="#00A878" />
+        <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-[#1e3a8a]/10">
+          <Ionicons name="checkmark-circle" size={48} color="#1e3a8a" />
         </View>
         <Text className="text-center text-xl font-black text-[#0F172A]">
           Pedido confirmado
@@ -83,19 +83,19 @@ export default function OrderSuccessScreen() {
         <Text className="mt-2 text-center text-sm text-[#94A3B8]">
           #{orderId.slice(0, 8)}… · {orderStatusLabel(status)}
         </Text>
-        <Text className="mt-4 text-3xl font-black text-[#00A878]">
+        <Text className="mt-4 text-3xl font-black text-[#1e3a8a]">
           ${Number.isFinite(total) ? total.toFixed(2) : '—'}
         </Text>
         <Text className="mt-1 text-xs text-[#94A3B8]">Total pagado (simulado)</Text>
 
         {ensuringDelivery ? (
           <View className="mt-8 w-full items-center rounded-xl border border-[#E2E8F0] py-4">
-            <ActivityIndicator color="#00A878" />
+            <ActivityIndicator color="#1e3a8a" />
             <Text className="mt-2 text-xs text-[#94A3B8]">Preparando seguimiento…</Text>
           </View>
         ) : deliveryId ? (
           <Pressable
-            className="mt-8 w-full flex-row items-center justify-center rounded-xl bg-[#00A878] py-4"
+            className="mt-8 w-full flex-row items-center justify-center rounded-xl bg-[#1e3a8a] py-4"
             onPress={() =>
               router.replace({
                 pathname: '/delivery/[id]',
@@ -111,7 +111,7 @@ export default function OrderSuccessScreen() {
         ) : null}
         <Pressable
           className={`w-full items-center rounded-xl py-4 ${
-            deliveryId ? 'mt-3 border border-[#E2E8F0]' : 'mt-8 bg-[#00A878]'
+            deliveryId ? 'mt-3 border border-[#E2E8F0]' : 'mt-8 bg-[#1e3a8a]'
           }`}
           onPress={() => router.replace(getDefaultTabHref('cliente'))}
         >

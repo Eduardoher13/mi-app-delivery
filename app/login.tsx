@@ -98,7 +98,7 @@ export default function LoginScreen() {
   if (authLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator color="#00A878" size="large" />
+        <ActivityIndicator color="#1e3a8a" size="large" />
       </View>
     );
   }
@@ -117,7 +117,7 @@ export default function LoginScreen() {
           <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
             BIENVENIDO A
           </Text>
-          <Text className="text-3xl font-black italic text-[#00A878]">Listo!</Text>
+          <Text className="text-3xl font-black italic text-[#1e3a8a]">Listo!</Text>
           <Text className="mt-2 text-sm text-[#94A3B8]">
             Inicia sesión para solicitar servicios o gestionar tu cuenta
           </Text>
@@ -154,7 +154,7 @@ export default function LoginScreen() {
           ) : null}
 
           <Pressable
-            className="mt-6 items-center rounded-xl bg-[#00A878] py-4"
+            className="mt-6 items-center rounded-xl bg-[#1e3a8a] py-4"
             onPress={() => void handleLogin()}
             disabled={submitting}
           >
@@ -169,7 +169,7 @@ export default function LoginScreen() {
             <Text className="text-sm text-[#94A3B8]">¿No tienes una cuenta? </Text>
             <Link href="/register" asChild>
               <Pressable hitSlop={8}>
-                <Text className="text-sm font-bold text-[#00A878]">Regístrate aquí</Text>
+                <Text className="text-sm font-bold text-[#1e3a8a]">Regístrate aquí</Text>
               </Pressable>
             </Link>
           </View>
@@ -187,11 +187,11 @@ export default function LoginScreen() {
           </Pressable>
 
           <Pressable
-            className="mb-2 items-center rounded-xl border border-[#00A878] py-3"
+            className="mb-2 items-center rounded-xl border border-[#1e3a8a] py-3"
             onPress={() => void handleDemoLogin(loginAsEmpresaDemo, DEMO_EMPRESA_EMAIL)}
             disabled={submitting}
           >
-            <Text className="text-sm font-bold text-[#00A878]">Entrar como empresa (SINSA)</Text>
+            <Text className="text-sm font-bold text-[#1e3a8a]">Entrar como empresa (SINSA)</Text>
           </Pressable>
 
           <View className="mb-2 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3">

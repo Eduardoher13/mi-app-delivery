@@ -106,7 +106,7 @@ export default function ProductsScreen() {
 
         {loading ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#00A878" size="large" />
+            <ActivityIndicator color="#1e3a8a" size="large" />
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-4">
@@ -128,7 +128,7 @@ export default function ProductsScreen() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={() => void loadStores(true)}
-                tintColor="#00A878"
+                tintColor="#1e3a8a"
               />
             }
           >

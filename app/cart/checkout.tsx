@@ -9,7 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
+import { LocationMap } from '../../components/LocationMap';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../../contexts/AuthContext';
@@ -99,8 +99,10 @@ export default function CartCheckoutScreen() {
     try {
       const coords = await getFastMapCoords();
       setMapCoords(coords);
-    } catch {
-      setValidationError('No se pudo obtener tu ubicación. Revisa los permisos del teléfono.');
+    } catch (err) {
+      setValidationError(
+        err instanceof Error ? err.message : 'No se pudo obtener tu ubicación. Revisa los permisos del teléfono.',
+      );
     } finally {
       setLocatingMap(false);
     }
@@ -164,12 +166,8 @@ export default function CartCheckoutScreen() {
     }
   };
 
-  const mapRegion: Region = {
-    latitude: mapCoords?.latitude ?? MANAGUA_COORDS.latitude,
-    longitude: mapCoords?.longitude ?? MANAGUA_COORDS.longitude,
-    latitudeDelta: MANAGUA_COORDS.latitudeDelta,
-    longitudeDelta: MANAGUA_COORDS.longitudeDelta,
-  };
+  const mapLatitude = mapCoords?.latitude ?? MANAGUA_COORDS.latitude;
+  const mapLongitude = mapCoords?.longitude ?? MANAGUA_COORDS.longitude;
 
   if (lines.length === 0) {
     return null;
@@ -198,12 +196,12 @@ export default function CartCheckoutScreen() {
 
         <View className="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-3">
           <Text className="text-xs text-[#94A3B8]">Subtotal del pedido</Text>
-          <Text className="text-lg font-black text-[#00A878]">${subtotal.toFixed(2)}</Text>
+          <Text className="text-lg font-black text-[#1e3a8a]">${subtotal.toFixed(2)}</Text>
         </View>
 
         {prefillLoading ? (
           <View className="mt-8 items-center">
-            <ActivityIndicator color="#00A878" />
+            <ActivityIndicator color="#1e3a8a" />
           </View>
         ) : (
           <>
@@ -244,13 +242,13 @@ export default function CartCheckoutScreen() {
               Ayuda al repartidor a encontrarte. Puedes omitirlo si ya describiste bien la dirección.
             </Text>
 
-            <View className="overflow-hidden rounded-xl border border-[#E2E8F0]">
-              <MapView style={{ height: 180, width: '100%' }} region={mapRegion}>
-                {mapCoords ? (
-                  <Marker coordinate={mapCoords} title="Entrega" pinColor="#00A878" />
-                ) : null}
-              </MapView>
-            </View>
+            <LocationMap
+              latitude={mapLatitude}
+              longitude={mapLongitude}
+              height={180}
+              title="Entrega"
+              showMarker={Boolean(mapCoords)}
+            />
 
             <Pressable
               className="mt-2 flex-row items-center self-start rounded-lg border border-[#E2E8F0] px-3 py-2"
@@ -258,9 +256,9 @@ export default function CartCheckoutScreen() {
               disabled={locatingMap}
             >
               {locatingMap ? (
-                <ActivityIndicator size="small" color="#00A878" />
+                <ActivityIndicator size="small" color="#1e3a8a" />
               ) : null}
-              <Text className={`text-xs font-bold text-[#00A878] ${locatingMap ? 'ml-2' : ''}`}>
+              <Text className={`text-xs font-bold text-[#1e3a8a] ${locatingMap ? 'ml-2' : ''}`}>
                 {locatingMap ? 'Obteniendo ubicación…' : 'Usar mi ubicación actual'}
               </Text>
             </Pressable>
@@ -284,7 +282,7 @@ export default function CartCheckoutScreen() {
         ) : null}
 
         <Pressable
-          className="mt-6 items-center rounded-xl bg-[#00A878] py-4"
+          className="mt-6 items-center rounded-xl bg-[#1e3a8a] py-4"
           onPress={() => void handleConfirm()}
           disabled={submitting || prefillLoading}
         >

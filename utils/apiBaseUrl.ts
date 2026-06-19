@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 const DEFAULT_API_PORT = '8001';
 
@@ -52,15 +53,42 @@ function isLocalBaseUrl(url: string): boolean {
   );
 }
 
+function getRemoteConfiguredUrl(explicit: string, fromExtra: string): string {
+  if (explicit && !isLocalBaseUrl(explicit)) {
+    return explicit;
+  }
+
+  if (fromExtra && !isLocalBaseUrl(fromExtra)) {
+    return fromExtra;
+  }
+
+  return '';
+}
+
 /**
  * Resuelve la URL del backend NestJS.
- * En desarrollo con Expo Go usa la misma IP que Metro (cambia sola al cambiar de WiFi).
- * En builds EAS/APK usa EXPO_PUBLIC_API_BASE_URL o extra.apiBaseUrl (Render, etc.).
+ * - Web: usa EXPO_PUBLIC_API_BASE_URL (Render) si está definida; el navegador no
+ *   puede usar la IP LAN de Metro como Expo Go en el teléfono.
+ * - Expo Go (nativo) en dev: misma IP que Metro.
+ * - Builds EAS/APK: EXPO_PUBLIC_API_BASE_URL o extra.apiBaseUrl.
  */
 export function resolveApiBaseUrl(): string {
   const port = getConfiguredPort();
   const explicit = normalizeBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL ?? '');
   const fromExtra = getExtraApiBaseUrl();
+  const remoteUrl = getRemoteConfiguredUrl(explicit, fromExtra);
+
+  if (Platform.OS === 'web') {
+    if (remoteUrl) {
+      return remoteUrl;
+    }
+
+    if (explicit) {
+      return explicit;
+    }
+
+    return buildUrl('127.0.0.1', port);
+  }
 
   if (__DEV__) {
     const metroHost = getMetroHost();
@@ -94,7 +122,11 @@ export function getApiStatus() {
   const fromExtra = getExtraApiBaseUrl();
 
   let source = 'default (localhost)';
-  if (__DEV__ && metroHost) {
+  if (Platform.OS === 'web' && baseURL.startsWith('https://')) {
+    source = explicit
+      ? 'EXPO_PUBLIC_API_BASE_URL (web)'
+      : 'app.config extra (web)';
+  } else if (__DEV__ && metroHost) {
     source = 'Metro host (auto)';
   } else if (explicit) {
     source = 'EXPO_PUBLIC_API_BASE_URL';
@@ -111,4 +143,16 @@ export function getApiStatus() {
     metroHost,
     isLocalhost: isLocalBaseUrl(baseURL),
   };
+}
+
+export function getApiTimeoutMs(): number {
+  if (!__DEV__) {
+    return 90_000;
+  }
+
+  if (Platform.OS === 'web' && resolveApiBaseUrl().startsWith('https://')) {
+    return 90_000;
+  }
+
+  return 15_000;
 }

@@ -45,7 +45,7 @@ export default function CartScreen() {
               Tu carrito está vacío. Explora productos para agregar algo.
             </Text>
             <Pressable
-              className="mt-6 rounded-xl bg-[#00A878] px-6 py-3"
+              className="mt-6 rounded-xl bg-[#1e3a8a] px-6 py-3"
               onPress={() => router.push('/(tabs)/products')}
             >
               <Text className="text-sm font-bold text-white">Ver ferreterías</Text>
@@ -68,7 +68,7 @@ export default function CartScreen() {
                     <Text className="text-sm font-bold text-[#0F172A]" numberOfLines={2}>
                       {line.name}
                     </Text>
-                    <Text className="mt-1 text-sm font-bold text-[#00A878]">
+                    <Text className="mt-1 text-sm font-bold text-[#1e3a8a]">
                       ${line.price.toFixed(2)}
                     </Text>
                     <View className="mt-2 flex-row items-center justify-between">
@@ -106,7 +106,7 @@ export default function CartScreen() {
                 </Text>
               </View>
               <Pressable
-                className="items-center rounded-xl bg-[#00A878] py-4"
+                className="items-center rounded-xl bg-[#1e3a8a] py-4"
                 onPress={() => router.push('/cart/checkout' as Href)}
                 disabled={lines.length === 0}
               >

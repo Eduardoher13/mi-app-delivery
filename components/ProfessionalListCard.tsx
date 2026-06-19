@@ -19,7 +19,7 @@ function StarRating({ rating }: { rating: number }) {
           key={index}
           name={filled ? 'star' : 'star-outline'}
           size={14}
-          color="#00A878"
+          color="#1e3a8a"
         />
       ))}
       <Text className="ml-1 text-xs font-semibold text-[#0F172A]">{rating}</Text>
@@ -44,12 +44,12 @@ export function ProfessionalListCard({ service, onPress }: ProfessionalListCardP
           <View className="my-2">
             <StarRating rating={service.rating} />
           </View>
-          <Text className="text-sm font-bold text-[#00A878]">${service.price}/hr</Text>
+          <Text className="text-sm font-bold text-[#1e3a8a]">${service.price}/hr</Text>
         </View>
       </Pressable>
       <View className="flex-row items-center justify-end border-t border-[#E2E8F0] px-3 py-2">
         <Pressable
-          className="rounded-lg bg-[#00A878] px-4 py-2"
+          className="rounded-lg bg-[#1e3a8a] px-4 py-2"
           onPress={handlePress}
         >
           <Text className="text-xs font-bold text-white">Ver oferta</Text>

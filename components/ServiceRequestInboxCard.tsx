@@ -58,7 +58,7 @@ export function ServiceRequestInboxCard({
       </View>
 
       <View className="mt-3 flex-row items-center justify-between">
-        <Text className="text-xs font-semibold text-[#00A878]">
+        <Text className="text-xs font-semibold text-[#1e3a8a]">
           {statusLabel(request.status)}
         </Text>
         <Text className="text-xs text-[#94A3B8]">{formatDate(request.created_at)}</Text>

@@ -1,4 +1,5 @@
 import * as Location from 'expo-location';
+import { Platform } from 'react-native';
 
 import { MANAGUA_COORDS } from './constants';
 
@@ -13,7 +14,25 @@ export interface MapCoords {
   longitude: number;
 }
 
+function assertWebLocationContext(): void {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') {
+    return;
+  }
+
+  if (!window.isSecureContext) {
+    throw new Error(
+      'La ubicación en Safari requiere HTTPS. Abre el enlace seguro del sitio (no http://).',
+    );
+  }
+
+  if (!('geolocation' in navigator)) {
+    throw new Error('Tu navegador no admite geolocalización.');
+  }
+}
+
 async function ensureForegroundLocationPermission(): Promise<boolean> {
+  assertWebLocationContext();
+
   let { status } = await Location.getForegroundPermissionsAsync();
   if (status !== 'granted') {
     ({ status } = await Location.requestForegroundPermissionsAsync());
@@ -25,6 +44,10 @@ async function ensureForegroundLocationPermission(): Promise<boolean> {
 /** Precalienta permisos y caché de GPS para respuestas más rápidas al pulsar el botón. */
 export async function warmUpDeviceLocation(): Promise<void> {
   try {
+    if (Platform.OS === 'web') {
+      return;
+    }
+
     const granted = await ensureForegroundLocationPermission();
     if (!granted) {
       return;
@@ -40,19 +63,25 @@ export async function warmUpDeviceLocation(): Promise<void> {
 export async function getFastMapCoords(): Promise<MapCoords> {
   const granted = await ensureForegroundLocationPermission();
   if (!granted) {
-    throw new Error('Permiso de ubicación denegado');
+    throw new Error(
+      Platform.OS === 'web'
+        ? 'Permiso de ubicación denegado. En iPhone: Ajustes → Safari → Ubicación.'
+        : 'Permiso de ubicación denegado',
+    );
   }
 
-  const last = await Location.getLastKnownPositionAsync({ maxAge: 120_000 });
-  if (last) {
-    return {
-      latitude: last.coords.latitude,
-      longitude: last.coords.longitude,
-    };
+  if (Platform.OS !== 'web') {
+    const last = await Location.getLastKnownPositionAsync({ maxAge: 120_000 });
+    if (last) {
+      return {
+        latitude: last.coords.latitude,
+        longitude: last.coords.longitude,
+      };
+    }
   }
 
   const position = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.Lowest,
+    accuracy: Platform.OS === 'web' ? Location.Accuracy.Balanced : Location.Accuracy.Lowest,
   });
 
   return {

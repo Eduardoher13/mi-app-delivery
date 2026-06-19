@@ -137,7 +137,7 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
       </Text>
 
       {loading ? (
-        <ActivityIndicator className="mt-6" color="#00A878" />
+        <ActivityIndicator className="mt-6" color="#1e3a8a" />
       ) : (
         <>
           {products.map((product) => (
@@ -153,7 +153,7 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
                 <Text className="text-sm font-bold text-[#0F172A]" numberOfLines={1}>
                   {product.name}
                 </Text>
-                <Text className="text-xs text-[#00A878]">
+                <Text className="text-xs text-[#1e3a8a]">
                   ${product.price.toFixed(2)}
                 </Text>
               </View>
@@ -163,7 +163,7 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
                 disabled={busy}
               >
                 {uploadingProductId === product.id ? (
-                  <ActivityIndicator color="#00A878" size="small" />
+                  <ActivityIndicator color="#1e3a8a" size="small" />
                 ) : (
                   <Text className="text-[10px] font-bold text-[#0F172A]">
                     Imagen
@@ -215,7 +215,7 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
               </Text>
               <View className="flex-row gap-2">
                 <Pressable
-                  className="flex-1 items-center rounded-lg bg-[#00A878] py-2.5"
+                  className="flex-1 items-center rounded-lg bg-[#1e3a8a] py-2.5"
                   onPress={() => void handleCreateAndUpload()}
                   disabled={busy}
                 >
@@ -238,10 +238,10 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
             </View>
           ) : (
             <Pressable
-              className="mt-4 items-center rounded-lg border border-dashed border-[#00A878] py-3"
+              className="mt-4 items-center rounded-lg border border-dashed border-[#1e3a8a] py-3"
               onPress={() => setShowForm(true)}
             >
-              <Text className="text-xs font-bold text-[#00A878]">
+              <Text className="text-xs font-bold text-[#1e3a8a]">
                 + Agregar producto
               </Text>
             </Pressable>

@@ -43,7 +43,7 @@ export function OrderInboxCard({ preview }: OrderInboxCardProps) {
         <Text className="text-sm font-bold text-[#0F172A]">
           Pedido #{order.id.slice(0, 8)}
         </Text>
-        <Text className="text-xs font-semibold text-[#00A878]">
+        <Text className="text-xs font-semibold text-[#1e3a8a]">
           {statusLabel(order.status)}
         </Text>
       </View>
@@ -72,7 +72,7 @@ export function OrderInboxCard({ preview }: OrderInboxCardProps) {
 
       <View className="mt-3 flex-row items-center justify-between border-t border-[#E2E8F0] pt-3">
         <Text className="text-xs text-[#94A3B8]">Subtotal ferretería</Text>
-        <Text className="text-sm font-black text-[#00A878]">
+        <Text className="text-sm font-black text-[#1e3a8a]">
           ${companySubtotal.toFixed(2)}
         </Text>
       </View>

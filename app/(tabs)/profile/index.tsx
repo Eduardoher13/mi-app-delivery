@@ -119,7 +119,7 @@ export default function ProfileScreen() {
                 Logo visible en el catálogo de tiendas
               </Text>
               <Pressable
-                className="mt-4 rounded-lg bg-[#00A878] px-5 py-2.5"
+                className="mt-4 rounded-lg bg-[#1e3a8a] px-5 py-2.5"
                 onPress={() => void handleUploadCompanyLogo()}
                 disabled={uploadingLogo}
               >
@@ -142,7 +142,7 @@ export default function ProfileScreen() {
                 {user?.name ?? 'Usuario'}
               </Text>
               <Pressable
-                className="mt-4 rounded-lg bg-[#00A878] px-5 py-2.5"
+                className="mt-4 rounded-lg bg-[#1e3a8a] px-5 py-2.5"
                 onPress={() => void handleUploadAvatar()}
                 disabled={uploading}
               >
