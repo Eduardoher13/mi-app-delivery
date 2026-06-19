@@ -1,4 +1,4 @@
-import { StyleProp, ViewStyle } from 'react-native';
+import { StyleProp, View, ViewStyle } from 'react-native';
 
 import { WebDirectionsMap } from './WebMapView.web';
 import { LatLng } from '../utils/decodePolyline';
@@ -12,15 +12,9 @@ interface DeliveryMapProps {
 }
 
 export function DeliveryMap({ pickup, delivery, style }: DeliveryMapProps) {
-  const mapHeight =
-    typeof style === 'object' && style && 'height' in style ? Number(style.height) : 320;
-
   return (
-    <WebDirectionsMap
-      origin={pickup}
-      destination={delivery}
-      height={mapHeight}
-      title="Ruta de entrega"
-    />
+    <View style={[{ flex: 1, width: '100%', minHeight: 300 }, style]}>
+      <WebDirectionsMap origin={pickup} destination={delivery} fill title="Ruta de entrega" />
+    </View>
   );
 }

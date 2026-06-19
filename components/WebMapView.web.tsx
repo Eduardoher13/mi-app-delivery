@@ -1,7 +1,12 @@
 import { createElement } from 'react';
-import { Linking, Pressable } from 'react-native';
+import { Linking, Pressable, Text, View } from 'react-native';
 
-import { buildMapsOpenUrl } from '../utils/googleMaps';
+import { LatLng } from '../utils/decodePolyline';
+import {
+  buildDirectionsOpenUrl,
+  buildMapsOpenUrl,
+  buildOsmRouteEmbedUrl,
+} from '../utils/googleMaps';
 
 interface WebMapViewProps {
   latitude: number;
@@ -45,9 +50,10 @@ export function WebMapView({
 }
 
 interface WebDirectionsMapProps {
-  origin: { latitude: number; longitude: number };
-  destination: { latitude: number; longitude: number };
+  origin: LatLng;
+  destination: LatLng;
   height?: number;
+  fill?: boolean;
   title?: string;
 }
 
@@ -55,35 +61,44 @@ export function WebDirectionsMap({
   origin,
   destination,
   height = 320,
+  fill = false,
   title = 'Ruta de entrega',
 }: WebDirectionsMapProps) {
-  const embedUrl =
-    `https://www.google.com/maps/dir/?api=1` +
-    `&origin=${origin.latitude},${origin.longitude}` +
-    `&destination=${destination.latitude},${destination.longitude}` +
-    `&hl=es&output=embed`;
+  const embedUrl = buildOsmRouteEmbedUrl(origin, destination);
+  const directionsUrl = buildDirectionsOpenUrl(origin, destination);
+  const iframeHeight = fill ? '100%' : height;
 
   return (
-    <Pressable
-      className="overflow-hidden rounded-xl border border-[#E2E8F0]"
-      onPress={() =>
-        void Linking.openURL(buildMapsOpenUrl(destination.latitude, destination.longitude))
-      }
-      accessibilityLabel={title}
-    >
-      {createElement('iframe', {
-        title,
-        src: embedUrl,
-        width: '100%',
-        height,
-        loading: 'lazy',
-        referrerPolicy: 'no-referrer-when-downgrade',
-        style: {
-          border: 0,
-          display: 'block',
-          pointerEvents: 'none',
-        },
-      })}
-    </Pressable>
+    <View style={fill ? { flex: 1, width: '100%', minHeight: 300, position: 'relative' } : { position: 'relative' }}>
+      <Pressable
+        style={fill ? { flex: 1, width: '100%' } : undefined}
+        className={fill ? undefined : 'overflow-hidden rounded-xl border border-[#E2E8F0]'}
+        onPress={() => void Linking.openURL(directionsUrl)}
+        accessibilityLabel={title}
+      >
+        {createElement('iframe', {
+          title,
+          src: embedUrl,
+          width: '100%',
+          height: iframeHeight,
+          loading: 'lazy',
+          referrerPolicy: 'no-referrer-when-downgrade',
+          style: {
+            border: 0,
+            display: 'block',
+            pointerEvents: 'none',
+            width: '100%',
+            height: iframeHeight,
+            minHeight: fill ? 300 : height,
+          },
+        })}
+      </Pressable>
+      <Pressable
+        className="absolute bottom-3 right-3 rounded-lg bg-white/95 px-3 py-2 shadow-sm"
+        onPress={() => void Linking.openURL(directionsUrl)}
+      >
+        <Text className="text-[10px] font-bold text-[#1e3a8a]">Abrir ruta en Google Maps</Text>
+      </Pressable>
+    </View>
   );
 }

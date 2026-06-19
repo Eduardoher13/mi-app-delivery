@@ -16,6 +16,39 @@ export function buildMapsOpenUrl(latitude: number, longitude: number): string {
   return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 }
 
+export function buildDirectionsOpenUrl(
+  origin: LatLng,
+  destination: LatLng,
+): string {
+  return (
+    `https://www.google.com/maps/dir/?api=1` +
+    `&origin=${origin.latitude},${origin.longitude}` +
+    `&destination=${destination.latitude},${destination.longitude}`
+  );
+}
+
+/** Mapa embebido con tienda + destino (sin API key; funciona en iframe). */
+export function buildOsmRouteEmbedUrl(
+  origin: LatLng,
+  destination: LatLng,
+  padding = 0.02,
+): string {
+  const south = Math.min(origin.latitude, destination.latitude) - padding;
+  const north = Math.max(origin.latitude, destination.latitude) + padding;
+  const west = Math.min(origin.longitude, destination.longitude) - padding;
+  const east = Math.max(origin.longitude, destination.longitude) + padding;
+
+  const params = new URLSearchParams({
+    bbox: `${west},${south},${east},${north}`,
+    layer: 'mapnik',
+  });
+
+  params.append('marker', `${origin.latitude},${origin.longitude}`);
+  params.append('marker', `${destination.latitude},${destination.longitude}`);
+
+  return `https://www.openstreetmap.org/export/embed.html?${params.toString()}`;
+}
+
 export function buildStaticMapUrl(options: {
   width?: number;
   height?: number;
