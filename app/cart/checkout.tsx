@@ -9,7 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { LocationMap } from '../../components/LocationMap';
+import { LocationPickerMap } from '../../components/LocationPickerMap';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../../contexts/AuthContext';
@@ -41,6 +41,9 @@ export default function CartCheckoutScreen() {
   const [mapCoords, setMapCoords] = useState<{ latitude: number; longitude: number } | null>(
     null,
   );
+  const [flyTo, setFlyTo] = useState<
+    { latitude: number; longitude: number; key: number } | null
+  >(null);
   const [prefillLoading, setPrefillLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [locatingMap, setLocatingMap] = useState(false);
@@ -99,7 +102,7 @@ export default function CartCheckoutScreen() {
 
     try {
       const coords = await getFastMapCoords();
-      setMapCoords(coords);
+      setFlyTo({ ...coords, key: Date.now() });
     } catch (err) {
       setValidationError(
         err instanceof Error ? err.message : 'No se pudo obtener tu ubicación. Revisa los permisos del teléfono.',
@@ -167,9 +170,6 @@ export default function CartCheckoutScreen() {
     }
   };
 
-  const mapLatitude = mapCoords?.latitude ?? MANAGUA_COORDS.latitude;
-  const mapLongitude = mapCoords?.longitude ?? MANAGUA_COORDS.longitude;
-
   if (lines.length === 0) {
     return null;
   }
@@ -180,6 +180,7 @@ export default function CartCheckoutScreen() {
         className="flex-1"
         contentContainerClassName="px-4 pb-10 pt-2"
         keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
       >
         <View className="flex-row items-center">
           <Pressable
@@ -240,15 +241,20 @@ export default function CartCheckoutScreen() {
               UBICACIÓN EN MAPA (OPCIONAL)
             </Text>
             <Text className="mb-3 text-xs text-[#94A3B8]">
-              Ayuda al repartidor a encontrarte. Puedes omitirlo si ya describiste bien la dirección.
+              Mueve el mapa y confirma dónde quieres recibir el pedido. Es opcional si ya
+              describiste bien la dirección.
             </Text>
 
-            <LocationMap
-              latitude={mapLatitude}
-              longitude={mapLongitude}
-              height={180}
-              title="Entrega"
-              showMarker={Boolean(mapCoords)}
+            <LocationPickerMap
+              height={220}
+              initialCenter={{
+                latitude: MANAGUA_COORDS.latitude,
+                longitude: MANAGUA_COORDS.longitude,
+              }}
+              flyTo={flyTo}
+              confirmedCenter={mapCoords}
+              onConfirm={setMapCoords}
+              onClear={() => setMapCoords(null)}
             />
 
             <Pressable
@@ -260,18 +266,9 @@ export default function CartCheckoutScreen() {
                 <ActivityIndicator size="small" color="#1e3a8a" />
               ) : null}
               <Text className={`text-xs font-bold text-[#1e3a8a] ${locatingMap ? 'ml-2' : ''}`}>
-                {locatingMap ? 'Obteniendo ubicación…' : 'Usar mi ubicación actual'}
+                {locatingMap ? 'Obteniendo ubicación…' : 'Ir a mi ubicación actual'}
               </Text>
             </Pressable>
-
-            {mapCoords ? (
-              <Pressable
-                className="mt-2 self-start px-1 py-1"
-                onPress={() => setMapCoords(null)}
-              >
-                <Text className="text-xs font-semibold text-[#94A3B8]">Quitar ubicación del mapa</Text>
-              </Pressable>
-            ) : null}
           </>
         )}
 
