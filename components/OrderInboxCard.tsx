@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { CompanyOrderPreview } from '../services/orders';
+import { formatCordoba } from '../utils/currency';
 
 interface OrderInboxCardProps {
   preview: CompanyOrderPreview;
@@ -63,8 +64,8 @@ export function OrderInboxCard({ preview }: OrderInboxCardProps) {
               {line.productName}
             </Text>
             <Text className="text-xs font-semibold text-[#94A3B8]">×{line.quantity}</Text>
-            <Text className="ml-2 min-w-[56px] text-right text-xs font-bold text-[#0F172A]">
-              ${line.subtotal.toFixed(2)}
+            <Text className="ml-2 min-w-[64px] text-right text-xs font-bold text-[#0F172A]">
+              {formatCordoba(line.subtotal)}
             </Text>
           </View>
         ))}
@@ -73,7 +74,7 @@ export function OrderInboxCard({ preview }: OrderInboxCardProps) {
       <View className="mt-3 flex-row items-center justify-between border-t border-[#E2E8F0] pt-3">
         <Text className="text-xs text-[#94A3B8]">Subtotal ferretería</Text>
         <Text className="text-sm font-black text-[#1e3a8a]">
-          ${companySubtotal.toFixed(2)}
+          {formatCordoba(companySubtotal)}
         </Text>
       </View>
     </View>

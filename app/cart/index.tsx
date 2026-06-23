@@ -13,6 +13,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { isCliente } from '../../utils/roles';
+import { formatCordoba } from '../../utils/currency';
 
 export default function CartScreen() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function CartScreen() {
                       {line.name}
                     </Text>
                     <Text className="mt-1 text-sm font-bold text-[#1e3a8a]">
-                      ${line.price.toFixed(2)}
+                      {formatCordoba(line.price)}
                     </Text>
                     <View className="mt-2 flex-row items-center justify-between">
                       <View className="flex-row items-center">
@@ -102,7 +103,7 @@ export default function CartScreen() {
               <View className="mb-3 flex-row items-center justify-between">
                 <Text className="text-sm text-[#94A3B8]">Subtotal</Text>
                 <Text className="text-xl font-black text-[#0F172A]">
-                  ${subtotal.toFixed(2)}
+                  {formatCordoba(subtotal)}
                 </Text>
               </View>
               <Pressable

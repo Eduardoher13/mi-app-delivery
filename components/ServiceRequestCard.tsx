@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, Text, View } from 'react-native';
 
 import { ServiceProvider } from '../types';
+import { formatCordobaPerHour } from '../utils/currency';
 
 interface ServiceRequestCardProps {
   service: ServiceProvider;
@@ -48,7 +49,7 @@ export function ServiceRequestCard({ service, onPress }: ServiceRequestCardProps
       </Pressable>
       <View className="flex-row items-center justify-between px-3 pb-3">
         <Text className="text-sm font-bold text-[#1e3a8a]">
-          ${service.price}/hr
+          {formatCordobaPerHour(service.price)}
         </Text>
         <Pressable
           className="rounded-lg bg-[#1e3a8a] px-3 py-1.5"

@@ -29,6 +29,7 @@ import {
 } from '../../services/serviceRequests';
 import { getSpecialtyNameById } from '../../utils/constants';
 import { isCliente } from '../../utils/roles';
+import { formatCordoba } from '../../utils/currency';
 import { serviceRequestStatusLabel } from '../../utils/serviceRequestStatus';
 
 function formatDate(iso: string): string {
@@ -216,7 +217,7 @@ export default function ServiceRequestDetailScreen() {
                   <Text className="mt-2 text-sm font-bold text-[#0F172A]">{proName}</Text>
                 ) : null}
                 <Text className="mt-2 text-2xl font-black text-[#1e3a8a]">
-                  ${parseOfferPrice(displayOffer.price).toFixed(2)}
+                  {formatCordoba(parseOfferPrice(displayOffer.price))}
                 </Text>
                 {displayOffer.message ? (
                   <Text className="mt-2 text-sm text-[#0F172A]">{displayOffer.message}</Text>

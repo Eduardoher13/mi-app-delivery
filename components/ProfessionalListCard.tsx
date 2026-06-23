@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, Text, View } from 'react-native';
 
 import { ServiceProvider } from '../types';
+import { formatCordobaPerHour } from '../utils/currency';
 
 interface ProfessionalListCardProps {
   service: ServiceProvider;
@@ -44,7 +45,9 @@ export function ProfessionalListCard({ service, onPress }: ProfessionalListCardP
           <View className="my-2">
             <StarRating rating={service.rating} />
           </View>
-          <Text className="text-sm font-bold text-[#1e3a8a]">${service.price}/hr</Text>
+          <Text className="text-sm font-bold text-[#1e3a8a]">
+            {formatCordobaPerHour(service.price)}
+          </Text>
         </View>
       </Pressable>
       <View className="flex-row items-center justify-end border-t border-[#E2E8F0] px-3 py-2">

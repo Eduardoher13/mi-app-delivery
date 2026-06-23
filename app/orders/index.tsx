@@ -17,6 +17,7 @@ import { formatApiError } from '../../services/api';
 import { getDeliveries } from '../../services/deliveries';
 import { ensureDeliveryForOrder, getOrdersForClient, Order } from '../../services/orders';
 import { resolveClientId } from '../../services/serviceRequests';
+import { formatCordoba } from '../../utils/currency';
 import { isCliente } from '../../utils/roles';
 
 function statusLabel(status: string): string {
@@ -164,7 +165,6 @@ export default function ClientOrdersScreen() {
             }
           >
             {orders.map((order) => {
-              const total = Number.parseFloat(order.total);
               const deliveryId = deliveryByOrder[order.id];
 
               return (
@@ -182,7 +182,7 @@ export default function ClientOrdersScreen() {
                   </View>
                   <View className="mt-3 flex-row items-center justify-between">
                     <Text className="text-base font-black text-[#0F172A]">
-                      ${Number.isFinite(total) ? total.toFixed(2) : order.total}
+                      {formatCordoba(order.total)}
                     </Text>
                     <Text className="text-xs text-[#94A3B8]">
                       {formatDate(order.created_at)}

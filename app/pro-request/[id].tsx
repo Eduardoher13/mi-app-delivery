@@ -29,6 +29,7 @@ import {
 } from '../../services/serviceRequests';
 import { getSpecialtyNameById } from '../../utils/constants';
 import { isProfesional } from '../../utils/roles';
+import { formatCordoba } from '../../utils/currency';
 import { serviceRequestStatusLabel } from '../../utils/serviceRequestStatus';
 
 function formatDate(iso: string): string {
@@ -227,7 +228,7 @@ export default function ProRequestDetailScreen() {
                   TU COTIZACIÓN
                 </Text>
                 <Text className="mt-2 text-2xl font-black text-[#0F172A]">
-                  ${parseOfferPrice(myOffer.price).toFixed(2)}
+                  {formatCordoba(parseOfferPrice(myOffer.price))}
                 </Text>
                 {myOffer.message ? (
                   <Text className="mt-2 text-sm text-[#0F172A]">{myOffer.message}</Text>
@@ -244,7 +245,7 @@ export default function ProRequestDetailScreen() {
                 </Text>
                 <TextInput
                   className="mt-4 rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A]"
-                  placeholder="Precio (ej: 45.00)"
+                  placeholder="Precio en córdobas (ej: 1500.00)"
                   placeholderTextColor="#94A3B8"
                   keyboardType="decimal-pad"
                   value={priceInput}

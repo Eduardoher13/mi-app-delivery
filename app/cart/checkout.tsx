@@ -24,6 +24,7 @@ import { OrderDeliveryDetails } from '../../types/checkout';
 import { MANAGUA_COORDS } from '../../utils/constants';
 import { getFastMapCoords, warmUpDeviceLocation } from '../../utils/deviceLocation';
 import { getPhoneValidationMessage, isValidAppPhone } from '../../utils/phoneFormat';
+import { formatCordoba } from '../../utils/currency';
 import { isCliente } from '../../utils/roles';
 
 export default function CartCheckoutScreen() {
@@ -196,7 +197,7 @@ export default function CartCheckoutScreen() {
 
         <View className="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-3">
           <Text className="text-xs text-[#94A3B8]">Subtotal del pedido</Text>
-          <Text className="text-lg font-black text-[#1e3a8a]">${subtotal.toFixed(2)}</Text>
+          <Text className="text-lg font-black text-[#1e3a8a]">{formatCordoba(subtotal)}</Text>
         </View>
 
         {prefillLoading ? (

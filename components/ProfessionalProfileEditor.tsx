@@ -13,6 +13,7 @@ import {
   getProfessionalByUserId,
   updateProfessional,
 } from '../services/professionals';
+import { CORDOBA_SYMBOL } from '../utils/currency';
 
 interface ProfessionalProfileEditorProps {
   userId: string;
@@ -104,11 +105,11 @@ export function ProfessionalProfileEditor({ userId }: ProfessionalProfileEditorP
       />
 
       <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
-        TARIFA BASE ($/hr)
+        TARIFA BASE ({CORDOBA_SYMBOL}/hr)
       </Text>
       <TextInput
         className="rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A]"
-        placeholder="45.00"
+        placeholder="1500.00"
         placeholderTextColor="#94A3B8"
         value={basePrice}
         onChangeText={setBasePrice}

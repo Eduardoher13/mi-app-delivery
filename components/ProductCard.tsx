@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, Text, View } from 'react-native';
 
 import { Product } from '../types';
+import { formatCordoba } from '../utils/currency';
 
 interface ProductCardProps {
   product: Product;
@@ -42,7 +43,7 @@ export function ProductCard({
             {product.name}
           </Text>
           <Text className="mt-2 text-base font-bold text-[#1e3a8a]">
-            ${product.price.toFixed(2)}
+            {formatCordoba(product.price)}
           </Text>
         </View>
       </Pressable>

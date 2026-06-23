@@ -69,6 +69,10 @@ export const DEMO_COMPANY_ACCOUNTS = [
   { email: 'epa@empresa.com', name: 'EPA Nicaragua' },
   { email: 'jenny@empresa.com', name: 'Ferretería Jenny' },
   { email: 'blandon@empresa.com', name: 'Ferretería Blandón Moreno' },
+  { email: 'aguila@empresa.com', name: 'Ferretería El Águila' },
+  { email: 'alumicentro@empresa.com', name: 'Alumicentro Managua' },
+  { email: 'universal@empresa.com', name: 'Ferretería La Universal' },
+  { email: 'progreso@empresa.com', name: 'Ferretería El Progreso' },
 ] as const;
 
 /** @deprecated Los IDs de API (ej. 20) no coinciden con category.id local ('2'). Usa getSpecialtyNameById en services/specialties.ts */

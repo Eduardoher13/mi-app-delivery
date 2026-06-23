@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRoleRedirect } from '../../hooks/useRoleRedirect';
 import { ensureDeliveryForOrder } from '../../services/orders';
+import { formatCordoba } from '../../utils/currency';
 import { getDefaultTabHref, isCliente } from '../../utils/roles';
 
 function orderStatusLabel(status: string): string {
@@ -84,7 +85,7 @@ export default function OrderSuccessScreen() {
           #{orderId.slice(0, 8)}… · {orderStatusLabel(status)}
         </Text>
         <Text className="mt-4 text-3xl font-black text-[#1e3a8a]">
-          ${Number.isFinite(total) ? total.toFixed(2) : '—'}
+          {formatCordoba(total)}
         </Text>
         <Text className="mt-1 text-xs text-[#94A3B8]">Total pagado (simulado)</Text>
 

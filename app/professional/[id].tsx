@@ -17,6 +17,7 @@ import { getPrimarySpecialtySlugByProfessional } from '../../services/profession
 import { getProfessionalById } from '../../services/professionals';
 import { ServiceProviderDetail } from '../../types';
 import { goToNewServiceRequest } from '../../utils/navigation';
+import { formatCordoba } from '../../utils/currency';
 import { isCliente } from '../../utils/roles';
 
 function parseStringParam(value: string | string[] | undefined): string {
@@ -177,7 +178,7 @@ export default function ProfessionalOfferScreen() {
               TARIFA ESTIMADA
             </Text>
             <Text className="mt-1 text-3xl font-black text-[#1e3a8a]">
-              ${Number.isFinite(price) ? price.toFixed(2) : '—'}
+              {formatCordoba(price)}
               <Text className="text-base font-bold text-[#94A3B8]"> / hr</Text>
             </Text>
           </View>

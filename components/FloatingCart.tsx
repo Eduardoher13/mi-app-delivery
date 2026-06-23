@@ -1,5 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
+import { formatCordoba } from '../utils/currency';
+
 interface FloatingCartProps {
   itemCount: number;
   total: number;
@@ -18,7 +20,7 @@ export function FloatingCart({ itemCount, total, onPress }: FloatingCartProps) {
             TOTAL CARRITO
           </Text>
           <Text className="text-lg font-black text-white">
-            ${total.toFixed(2)}
+            {formatCordoba(total)}
           </Text>
         </View>
         <Pressable
