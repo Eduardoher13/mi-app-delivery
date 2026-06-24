@@ -3,6 +3,8 @@ import { useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -34,6 +36,8 @@ export default function CartCheckoutScreen() {
 
   const { lines, subtotal, clearCart } = useCart();
   const orderSubmittedRef = useRef(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const fieldOffsetsRef = useRef<Record<string, number>>({});
 
   const [contactName, setContactName] = useState('');
   const [phone, setPhone] = useState('');
@@ -112,6 +116,20 @@ export default function CartCheckoutScreen() {
     }
   }, []);
 
+  const scrollToField = useCallback((key: string) => {
+    const offsetY = fieldOffsetsRef.current[key];
+    if (offsetY == null) {
+      return;
+    }
+
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, offsetY - 16),
+        animated: true,
+      });
+    }, Platform.OS === 'ios' ? 250 : 80);
+  }, []);
+
   const validate = (): boolean => {
     if (!contactName.trim()) {
       setValidationError('Tu nombre es obligatorio.');
@@ -176,12 +194,20 @@ export default function CartCheckoutScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <ScrollView
+      <KeyboardAvoidingView
         className="flex-1"
-        contentContainerClassName="px-4 pb-10 pt-2"
-        keyboardShouldPersistTaps="handled"
-        nestedScrollEnabled
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 4 : 0}
       >
+        <ScrollView
+          ref={scrollRef}
+          className="flex-1"
+          contentContainerClassName="px-4 pb-40 pt-2"
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          nestedScrollEnabled
+          automaticallyAdjustKeyboardInsets
+        >
         <View className="flex-row items-center">
           <Pressable
             className="mr-3 h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0]"
@@ -207,35 +233,55 @@ export default function CartCheckoutScreen() {
           </View>
         ) : (
           <>
-            <Text className="mb-2 mt-6 text-xs font-semibold tracking-widest text-[#94A3B8]">
-              NOMBRE COMPLETO
-            </Text>
-            <TextInput
-              className="rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A]"
-              placeholder="Ej: María González"
-              placeholderTextColor="#94A3B8"
-              value={contactName}
-              onChangeText={setContactName}
-              autoCapitalize="words"
-            />
+            <View
+              onLayout={(event) => {
+                fieldOffsetsRef.current.name = event.nativeEvent.layout.y;
+              }}
+            >
+              <Text className="mb-2 mt-6 text-xs font-semibold tracking-widest text-[#94A3B8]">
+                NOMBRE COMPLETO
+              </Text>
+              <TextInput
+                className="rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A]"
+                placeholder="Ej: María González"
+                placeholderTextColor="#94A3B8"
+                value={contactName}
+                onChangeText={setContactName}
+                onFocus={() => scrollToField('name')}
+                autoCapitalize="words"
+              />
+            </View>
 
-            <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
-              TELÉFONO
-            </Text>
-            <PhoneInput value={phone} onChangeValue={setPhone} />
+            <View
+              onLayout={(event) => {
+                fieldOffsetsRef.current.phone = event.nativeEvent.layout.y;
+              }}
+            >
+              <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
+                TELÉFONO
+              </Text>
+              <PhoneInput value={phone} onChangeValue={setPhone} onFocus={() => scrollToField('phone')} />
+            </View>
 
-            <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
-              DIRECCIÓN DE ENTREGA
-            </Text>
-            <TextInput
-              className="min-h-[80px] rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A]"
-              placeholder="Colonia, referencias, número de casa..."
-              placeholderTextColor="#94A3B8"
-              value={address}
-              onChangeText={setAddress}
-              multiline
-              textAlignVertical="top"
-            />
+            <View
+              onLayout={(event) => {
+                fieldOffsetsRef.current.address = event.nativeEvent.layout.y;
+              }}
+            >
+              <Text className="mb-2 mt-4 text-xs font-semibold tracking-widest text-[#94A3B8]">
+                DIRECCIÓN DE ENTREGA
+              </Text>
+              <TextInput
+                className="min-h-[80px] rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm text-[#0F172A]"
+                placeholder="Colonia, referencias, número de casa..."
+                placeholderTextColor="#94A3B8"
+                value={address}
+                onChangeText={setAddress}
+                onFocus={() => scrollToField('address')}
+                multiline
+                textAlignVertical="top"
+              />
+            </View>
 
             <Text className="mb-2 mt-6 text-xs font-semibold tracking-widest text-[#94A3B8]">
               UBICACIÓN EN MAPA (OPCIONAL)
@@ -290,7 +336,8 @@ export default function CartCheckoutScreen() {
             <Text className="text-sm font-bold text-white">Confirmar pedido</Text>
           )}
         </Pressable>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

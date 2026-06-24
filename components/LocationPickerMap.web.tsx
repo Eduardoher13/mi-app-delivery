@@ -23,14 +23,11 @@ export function LocationPickerMap({
 }: LocationPickerMapProps) {
   const mapHostRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const [center, setCenter] = useState<MapCoords>(initialCenter);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const [draftCenter, setDraftCenter] = useState<MapCoords>(initialCenter);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-
-  const pinMatchesSaved =
-    confirmedCenter != null &&
-    Math.abs(confirmedCenter.latitude - center.latitude) < 0.00001 &&
-    Math.abs(confirmedCenter.longitude - center.longitude) < 0.00001;
+  const isLocked = confirmedCenter != null;
 
   useEffect(() => {
     let cancelled = false;
@@ -50,17 +47,21 @@ export function LocationPickerMap({
           center: { lat: initialCenter.latitude, lng: initialCenter.longitude },
           zoom: zoomFromDelta(MAP_PICKER_DELTA),
           disableDefaultUI: true,
-          zoomControl: true,
-          gestureHandling: 'greedy',
+          zoomControl: !isLocked,
+          gestureHandling: isLocked ? 'none' : 'greedy',
         });
 
         map.addListener('idle', () => {
+          if (isLocked) {
+            return;
+          }
+
           const mapCenter = map.getCenter();
           if (!mapCenter) {
             return;
           }
 
-          setCenter({
+          setDraftCenter({
             latitude: mapCenter.lat(),
             longitude: mapCenter.lng(),
           });
@@ -78,23 +79,81 @@ export function LocationPickerMap({
 
     return () => {
       cancelled = true;
+      markerRef.current = null;
       mapRef.current = null;
     };
   }, [initialCenter.latitude, initialCenter.longitude]);
 
   useEffect(() => {
-    if (!flyTo || !mapRef.current) {
+    const map = mapRef.current;
+    const maps = getGoogleMaps();
+    if (!map || !maps) {
+      return;
+    }
+
+    map.setOptions({
+      gestureHandling: isLocked ? 'none' : 'greedy',
+      zoomControl: !isLocked,
+      draggable: !isLocked,
+      scrollwheel: !isLocked,
+      disableDoubleClickZoom: isLocked,
+    });
+
+    if (isLocked && confirmedCenter) {
+      map.panTo({ lat: confirmedCenter.latitude, lng: confirmedCenter.longitude });
+
+      if (!markerRef.current) {
+        markerRef.current = new maps.Marker({
+          map,
+          position: {
+            lat: confirmedCenter.latitude,
+            lng: confirmedCenter.longitude,
+          },
+          title: 'Entrega confirmada',
+        });
+      } else {
+        markerRef.current.setPosition({
+          lat: confirmedCenter.latitude,
+          lng: confirmedCenter.longitude,
+        });
+        markerRef.current.setMap(map);
+      }
+      return;
+    }
+
+    markerRef.current?.setMap(null);
+  }, [isLocked, confirmedCenter?.latitude, confirmedCenter?.longitude]);
+
+  useEffect(() => {
+    if (!flyTo || !mapRef.current || isLocked) {
       return;
     }
 
     mapRef.current.panTo({ lat: flyTo.latitude, lng: flyTo.longitude });
-    setCenter({ latitude: flyTo.latitude, longitude: flyTo.longitude });
-  }, [flyTo?.key, flyTo?.latitude, flyTo?.longitude]);
+    setDraftCenter({ latitude: flyTo.latitude, longitude: flyTo.longitude });
+  }, [flyTo?.key, flyTo?.latitude, flyTo?.longitude, isLocked]);
+
+  const handleConfirm = () => {
+    onConfirm(draftCenter);
+  };
+
+  const handleChange = () => {
+    if (confirmedCenter) {
+      setDraftCenter(confirmedCenter);
+      mapRef.current?.panTo({
+        lat: confirmedCenter.latitude,
+        lng: confirmedCenter.longitude,
+      });
+    }
+    onClear?.();
+  };
 
   return (
     <View>
       <View
-        className="overflow-hidden rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]"
+        className={`overflow-hidden rounded-xl border ${
+          isLocked ? 'border-[#16A34A]' : 'border-[#E2E8F0]'
+        } bg-[#F8FAFC]`}
         style={{ height, position: 'relative' }}
       >
         {loading ? (
@@ -118,48 +177,51 @@ export function LocationPickerMap({
           },
         })}
 
-        {!loading && !loadError ? (
+        {!loading && !loadError && !isLocked ? (
           <View
             pointerEvents="none"
             className="absolute inset-0 items-center justify-center"
           >
-            <Ionicons
-              name="location"
-              size={40}
-              color={pinMatchesSaved ? '#16A34A' : '#1e3a8a'}
-              style={{ marginBottom: 40 }}
-            />
+            <View className="items-center" style={{ marginBottom: 40 }}>
+              <Ionicons name="location" size={40} color="#1e3a8a" />
+              <View className="mt-1 h-2 w-2 rounded-full bg-[#1e3a8a]/30" />
+            </View>
+          </View>
+        ) : null}
+
+        {isLocked ? (
+          <View
+            pointerEvents="none"
+            className="absolute left-2 top-2 z-10 flex-row items-center rounded-full bg-[#16A34A] px-2.5 py-1"
+          >
+            <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
+            <Text className="ml-1 text-[10px] font-bold text-white">Ubicación fijada</Text>
           </View>
         ) : null}
       </View>
 
       <Text className="mt-2 text-center text-xs text-[#94A3B8]">
-        Mueve el mapa hasta que el pin quede en tu entrada
+        {isLocked
+          ? 'Tu ubicación quedó guardada en el mapa.'
+          : 'Mueve el mapa hasta que el pin quede en tu entrada y confirma.'}
       </Text>
 
-      <Pressable
-        className="mt-3 items-center rounded-xl bg-[#1e3a8a] py-3"
-        onPress={() => onConfirm(center)}
-        disabled={Boolean(loadError)}
-      >
-        <Text className="text-sm font-bold text-white">Confirmar ubicación en mapa</Text>
-      </Pressable>
-
-      {confirmedCenter ? (
-        <View className="mt-2 flex-row items-center justify-between rounded-lg bg-[#F0FDF4] px-3 py-2">
-          <View className="flex-1 flex-row items-center">
-            <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
-            <Text className="ml-2 text-xs font-semibold text-[#166534]">
-              {pinMatchesSaved ? 'Ubicación guardada' : 'Confirma de nuevo si moviste el mapa'}
-            </Text>
-          </View>
-          {onClear ? (
-            <Pressable onPress={onClear} hitSlop={8}>
-              <Text className="text-xs font-semibold text-[#94A3B8]">Quitar</Text>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
+      {!isLocked ? (
+        <Pressable
+          className="mt-3 items-center rounded-xl bg-[#1e3a8a] py-3"
+          onPress={handleConfirm}
+          disabled={Boolean(loadError)}
+        >
+          <Text className="text-sm font-bold text-white">Confirmar ubicación en mapa</Text>
+        </Pressable>
+      ) : (
+        <Pressable
+          className="mt-3 items-center rounded-xl border border-[#E2E8F0] py-3"
+          onPress={handleChange}
+        >
+          <Text className="text-sm font-bold text-[#0F172A]">Cambiar ubicación</Text>
+        </Pressable>
+      )}
     </View>
   );
 }

@@ -38,7 +38,7 @@ export function formatApiError(error: unknown, fallback = 'Error de conexión'):
 
   if (error.code === 'ECONNABORTED') {
     const coldStartHint = baseURL.startsWith('https://')
-      ? ' El servidor en Render puede tardar ~1 min en despertar; intenta de nuevo.'
+      ? ' El servidor puede tardar unos segundos en arrancar; intenta de nuevo.'
       : '';
     return `Timeout al conectar con ${baseURL}.${coldStartHint}`;
   }
@@ -47,13 +47,13 @@ export function formatApiError(error: unknown, fallback = 'Error de conexión'):
     if (baseURL.startsWith('https://')) {
       return (
         `No se alcanza el backend en ${baseURL}. ` +
-        'Comprueba datos/WiFi. Si el servidor en Render está dormido, espera ~1 min e intenta otra vez.'
+        'Comprueba datos/WiFi. Si el servidor está iniciando, espera unos segundos e intenta otra vez.'
       );
     }
 
     const webHint =
       Platform.OS === 'web'
-        ? ' En web usa EXPO_PUBLIC_API_BASE_URL en .env (p. ej. Render).'
+        ? ' En web usa EXPO_PUBLIC_API_BASE_URL en .env (DigitalOcean).'
         : '';
 
     return (

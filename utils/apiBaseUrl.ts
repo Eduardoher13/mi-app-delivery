@@ -67,9 +67,7 @@ function getRemoteConfiguredUrl(explicit: string, fromExtra: string): string {
 
 /**
  * Resuelve la URL del backend NestJS.
- * - Web: usa EXPO_PUBLIC_API_BASE_URL (Render) si está definida; el navegador no
- *   puede usar la IP LAN de Metro como Expo Go en el teléfono.
- * - Expo Go (nativo) en dev: misma IP que Metro.
+ * - Web / Expo Go: EXPO_PUBLIC_API_BASE_URL (DigitalOcean) si está definida.
  * - Builds EAS/APK: EXPO_PUBLIC_API_BASE_URL o extra.apiBaseUrl.
  */
 export function resolveApiBaseUrl(): string {
@@ -91,6 +89,11 @@ export function resolveApiBaseUrl(): string {
   }
 
   if (__DEV__) {
+    // Si definiste una URL remota (Render/DO), úsala también en Expo Go.
+    if (remoteUrl) {
+      return remoteUrl;
+    }
+
     const metroHost = getMetroHost();
     if (metroHost) {
       if (metroHost === 'localhost' || metroHost.startsWith('127.')) {
@@ -120,12 +123,20 @@ export function getApiStatus() {
   const metroHost = getMetroHost();
   const explicit = Boolean(process.env.EXPO_PUBLIC_API_BASE_URL?.trim());
   const fromExtra = getExtraApiBaseUrl();
+  const remoteUrl = getRemoteConfiguredUrl(
+    normalizeBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL ?? ''),
+    fromExtra,
+  );
 
   let source = 'default (localhost)';
   if (Platform.OS === 'web' && baseURL.startsWith('https://')) {
     source = explicit
       ? 'EXPO_PUBLIC_API_BASE_URL (web)'
       : 'app.config extra (web)';
+  } else if (__DEV__ && remoteUrl && baseURL === remoteUrl) {
+    source = explicit
+      ? 'EXPO_PUBLIC_API_BASE_URL (dev remoto)'
+      : 'app.config extra (dev remoto)';
   } else if (__DEV__ && metroHost) {
     source = 'Metro host (auto)';
   } else if (explicit) {
@@ -151,6 +162,10 @@ export function getApiTimeoutMs(): number {
   }
 
   if (Platform.OS === 'web' && resolveApiBaseUrl().startsWith('https://')) {
+    return 90_000;
+  }
+
+  if (__DEV__ && resolveApiBaseUrl().startsWith('https://')) {
     return 90_000;
   }
 

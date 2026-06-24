@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { CountryCode as LibCountryCode } from 'libphonenumber-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View, type TextInputProps } from 'react-native';
 import CountryPicker, {
   Country,
   CountryCode,
@@ -24,6 +24,7 @@ interface PhoneInputProps {
   onChangeValue: (e164: string) => void;
   defaultCountryCode?: CountryCode;
   placeholder?: string;
+  onFocus?: TextInputProps['onFocus'];
 }
 
 function toLibCountryCode(code: CountryCode): LibCountryCode {
@@ -35,6 +36,7 @@ export function PhoneInput({
   onChangeValue,
   defaultCountryCode = DEFAULT_PHONE_COUNTRY as CountryCode,
   placeholder,
+  onFocus,
 }: PhoneInputProps) {
   const [countryCode, setCountryCode] = useState<CountryCode>(defaultCountryCode);
   const [callingCode, setCallingCode] = useState('505');
@@ -124,6 +126,7 @@ export function PhoneInput({
           placeholderTextColor="#94A3B8"
           value={localDisplay}
           onChangeText={handleLocalChange}
+          onFocus={onFocus}
           keyboardType="number-pad"
           maxLength={displayMaxLength}
           returnKeyType="done"
