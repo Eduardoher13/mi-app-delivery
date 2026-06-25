@@ -36,6 +36,10 @@ export const DELIVERY_DROPOFF_ADDRESS = 'Managua, Nicaragua';
 export const AUTH_TOKEN_KEY = '@listo/auth_token';
 export const AUTH_USER_KEY = '@listo/user';
 
+/** Cuenta demo cliente para pruebas del jurado (npm run seed en backend). */
+export const DEMO_CLIENTE_EMAIL = 'demo@cliente.com';
+export const DEMO_PASSWORD = 'demo123';
+
 /** Supabase Storage — un bucket con carpetas internas */
 export const SUPABASE_STORAGE_BUCKET = 'product_images';
 export const SUPABASE_FOLDER_AVATARS = 'avatars';

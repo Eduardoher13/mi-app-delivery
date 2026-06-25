@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,6 +31,10 @@ export default function ProfileScreen() {
   } = useCompanyLogoUpload();
   const [company, setCompany] = useState<Company | null>(null);
   const [companyError, setCompanyError] = useState<string | null>(null);
+  const [editingStoreName, setEditingStoreName] = useState(false);
+  const [storeNameDraft, setStoreNameDraft] = useState('');
+  const [savingStoreName, setSavingStoreName] = useState(false);
+  const [storeNameError, setStoreNameError] = useState<string | null>(null);
 
   const role = user?.role;
   const showCliente = isCliente(role) || (!isEmpresa(role) && !isProfesional(role));
@@ -84,6 +88,47 @@ export default function ProfileScreen() {
     await updateAvatarUrl(publicUrl);
   };
 
+  const startEditingStoreName = () => {
+    if (!company) {
+      return;
+    }
+
+    setStoreNameDraft(company.commercial_name);
+    setStoreNameError(null);
+    setEditingStoreName(true);
+  };
+
+  const cancelEditingStoreName = () => {
+    setEditingStoreName(false);
+    setStoreNameDraft('');
+    setStoreNameError(null);
+  };
+
+  const handleSaveStoreName = async () => {
+    if (!company) {
+      return;
+    }
+
+    const trimmed = storeNameDraft.trim();
+    if (!trimmed) {
+      setStoreNameError('El nombre no puede estar vacío');
+      return;
+    }
+
+    setSavingStoreName(true);
+    setStoreNameError(null);
+
+    try {
+      const updated = await updateCompany(company.id, { commercial_name: trimmed });
+      setCompany(updated);
+      setEditingStoreName(false);
+    } catch (err) {
+      setStoreNameError(err instanceof Error ? err.message : 'No se pudo guardar el nombre');
+    } finally {
+      setSavingStoreName(false);
+    }
+  };
+
   const profileTitle = showEmpresa ? 'Mi tienda' : 'Perfil';
 
   return (
@@ -113,7 +158,50 @@ export default function ProfileScreen() {
               <Text className="mt-3 text-lg font-bold text-[#0F172A]">
                 {company.commercial_name}
               </Text>
-              <Text className="mt-1 text-xs text-[#94A3B8]">
+
+              {editingStoreName ? (
+                <View className="mt-3 w-full">
+                  <TextInput
+                    className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-sm text-[#0F172A]"
+                    value={storeNameDraft}
+                    onChangeText={setStoreNameDraft}
+                    placeholder="Nombre de la ferretería"
+                    autoFocus
+                  />
+                  <View className="mt-2 flex-row gap-2">
+                    <Pressable
+                      className="flex-1 items-center rounded-lg bg-[#1e3a8a] py-2.5"
+                      onPress={() => void handleSaveStoreName()}
+                      disabled={savingStoreName}
+                    >
+                      {savingStoreName ? (
+                        <ActivityIndicator color="#FFFFFF" size="small" />
+                      ) : (
+                        <Text className="text-xs font-bold text-white">Guardar</Text>
+                      )}
+                    </Pressable>
+                    <Pressable
+                      className="items-center rounded-lg border border-[#E2E8F0] px-4 py-2.5"
+                      onPress={cancelEditingStoreName}
+                      disabled={savingStoreName}
+                    >
+                      <Text className="text-xs font-bold text-[#0F172A]">Cancelar</Text>
+                    </Pressable>
+                  </View>
+                  {storeNameError ? (
+                    <Text className="mt-2 text-center text-xs text-red-600">{storeNameError}</Text>
+                  ) : null}
+                </View>
+              ) : (
+                <Pressable
+                  className="mt-3 rounded-lg border border-[#E2E8F0] px-4 py-2"
+                  onPress={startEditingStoreName}
+                >
+                  <Text className="text-xs font-bold text-[#1e3a8a]">Cambiar nombre de la tienda</Text>
+                </Pressable>
+              )}
+
+              <Text className="mt-3 text-xs text-[#94A3B8]">
                 Logo visible en el catálogo de tiendas
               </Text>
               <Pressable

@@ -53,8 +53,8 @@ export default function ServicesScreen() {
 
       try {
         const data = specialtySlug
-          ? await getProfessionalsBySpecialty(specialtySlug, { limit: 20 })
-          : await getAvailableProfessionals({ limit: 20 });
+          ? await getProfessionalsBySpecialty(specialtySlug)
+          : await getAvailableProfessionals();
         setProfessionals(data);
       } catch (err) {
         setError(formatApiError(err));

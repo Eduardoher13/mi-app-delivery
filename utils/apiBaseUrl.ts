@@ -65,22 +65,38 @@ function getRemoteConfiguredUrl(explicit: string, fromExtra: string): string {
   return '';
 }
 
+function getProductionApiUrl(): string {
+  const fromExtra = getExtraApiBaseUrl();
+  const explicit = normalizeBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL ?? '');
+
+  if (fromExtra.startsWith('https://')) {
+    return fromExtra;
+  }
+
+  if (explicit.startsWith('https://')) {
+    return explicit;
+  }
+
+  return '';
+}
+
 /**
  * Resuelve la URL del backend NestJS.
- * - Web / Expo Go: EXPO_PUBLIC_API_BASE_URL (DigitalOcean) si está definida.
- * - Builds EAS/APK: EXPO_PUBLIC_API_BASE_URL o extra.apiBaseUrl.
+ * Si EXPO_PUBLIC_API_BASE_URL apunta a producción (https), siempre se usa —
+ * nunca el backend local de Metro en desarrollo.
  */
 export function resolveApiBaseUrl(): string {
   const port = getConfiguredPort();
-  const explicit = normalizeBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL ?? '');
+  const productionUrl = getProductionApiUrl();
+
+  if (productionUrl) {
+    return productionUrl;
+  }
+
   const fromExtra = getExtraApiBaseUrl();
-  const remoteUrl = getRemoteConfiguredUrl(explicit, fromExtra);
+  const explicit = normalizeBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL ?? '');
 
   if (Platform.OS === 'web') {
-    if (remoteUrl) {
-      return remoteUrl;
-    }
-
     if (explicit) {
       return explicit;
     }
@@ -89,11 +105,6 @@ export function resolveApiBaseUrl(): string {
   }
 
   if (__DEV__) {
-    // Si definiste una URL remota (Render/DO), úsala también en Expo Go.
-    if (remoteUrl) {
-      return remoteUrl;
-    }
-
     const metroHost = getMetroHost();
     if (metroHost) {
       if (metroHost === 'localhost' || metroHost.startsWith('127.')) {
@@ -121,24 +132,21 @@ export function resolveApiBaseUrl(): string {
 export function getApiStatus() {
   const baseURL = resolveApiBaseUrl();
   const metroHost = getMetroHost();
+  const productionUrl = getProductionApiUrl();
   const explicit = Boolean(process.env.EXPO_PUBLIC_API_BASE_URL?.trim());
   const fromExtra = getExtraApiBaseUrl();
-  const remoteUrl = getRemoteConfiguredUrl(
-    normalizeBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL ?? ''),
-    fromExtra,
-  );
 
   let source = 'default (localhost)';
-  if (Platform.OS === 'web' && baseURL.startsWith('https://')) {
+  if (productionUrl && baseURL === productionUrl) {
+    source = explicit
+      ? 'EXPO_PUBLIC_API_BASE_URL (producción)'
+      : 'app.config extra (producción)';
+  } else if (Platform.OS === 'web' && baseURL.startsWith('https://')) {
     source = explicit
       ? 'EXPO_PUBLIC_API_BASE_URL (web)'
       : 'app.config extra (web)';
-  } else if (__DEV__ && remoteUrl && baseURL === remoteUrl) {
-    source = explicit
-      ? 'EXPO_PUBLIC_API_BASE_URL (dev remoto)'
-      : 'app.config extra (dev remoto)';
   } else if (__DEV__ && metroHost) {
-    source = 'Metro host (auto)';
+    source = 'Metro host (local)';
   } else if (explicit) {
     source = 'EXPO_PUBLIC_API_BASE_URL';
   } else if (fromExtra && !isLocalBaseUrl(fromExtra)) {

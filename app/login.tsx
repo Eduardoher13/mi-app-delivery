@@ -14,11 +14,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../contexts/AuthContext';
 import { formatApiError } from '../services/api';
+import { DEMO_CLIENTE_EMAIL, DEMO_PASSWORD } from '../utils/constants';
 import { getDefaultTabHref } from '../utils/roles';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { user, token, loading: authLoading, login } = useAuth();
+  const { user, token, loading: authLoading, login, loginAsClienteDemo } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,6 +46,22 @@ export default function LoginScreen() {
       router.replace(getDefaultTabHref(loggedInUser.role));
     } catch (err) {
       setError(formatApiError(err, 'No se pudo iniciar sesión'));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleClienteDemo = async () => {
+    setEmail(DEMO_CLIENTE_EMAIL);
+    setPassword(DEMO_PASSWORD);
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      await loginAsClienteDemo();
+      router.replace(getDefaultTabHref('cliente'));
+    } catch (err) {
+      setError(formatApiError(err, 'No se pudo iniciar sesión demo'));
     } finally {
       setSubmitting(false);
     }
@@ -128,6 +145,17 @@ export default function LoginScreen() {
               </Pressable>
             </Link>
           </View>
+
+          <Pressable
+            className="mt-8 items-center rounded-xl border border-[#0F172A] py-3"
+            onPress={() => void handleClienteDemo()}
+            disabled={submitting}
+          >
+            <Text className="text-sm font-bold text-[#0F172A]">Entrar como cliente demo</Text>
+          </Pressable>
+          <Text className="mt-2 text-center text-[10px] text-[#94A3B8]">
+            Jurado: contraseña {DEMO_PASSWORD}
+          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

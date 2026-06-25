@@ -1,5 +1,6 @@
 import api from './api';
 import { parseListResponse } from './products';
+import { fetchAllPages } from '../utils/pagination';
 
 import { ApiProfessional, ServiceProvider, ServiceProviderDetail } from '../types';
 import { CATEGORIES } from '../utils/constants';
@@ -76,21 +77,13 @@ export async function updateProfessional(
   return data;
 }
 
-export async function getAvailableProfessionals(options?: {
-  limit?: number;
-  offset?: number;
-}): Promise<ServiceProvider[]> {
-  const params: Record<string, number> = {};
-
-  if (options?.limit !== undefined) {
-    params.limit = options.limit;
-  }
-  if (options?.offset !== undefined) {
-    params.offset = options.offset;
-  }
-
-  const { data } = await api.get('/professionals/available', { params });
-  const { items } = parseListResponse<ApiProfessional>(data);
+export async function getAvailableProfessionals(): Promise<ServiceProvider[]> {
+  const items = await fetchAllPages<ApiProfessional>(async (offset, limit) => {
+    const { data } = await api.get('/professionals/available', {
+      params: { offset, limit },
+    });
+    return parseListResponse(data);
+  });
 
   return items
     .filter((professional) => professional.is_available)
@@ -99,19 +92,13 @@ export async function getAvailableProfessionals(options?: {
 
 export async function getProfessionalsBySpecialty(
   slug: string,
-  options?: { limit?: number; offset?: number },
 ): Promise<ServiceProvider[]> {
-  const params: Record<string, number> = {};
-
-  if (options?.limit !== undefined) {
-    params.limit = options.limit;
-  }
-  if (options?.offset !== undefined) {
-    params.offset = options.offset;
-  }
-
-  const { data } = await api.get(`/professionals/by-specialty/${slug}`, { params });
-  const { items } = parseListResponse<ApiProfessional>(data);
+  const items = await fetchAllPages<ApiProfessional>(async (offset, limit) => {
+    const { data } = await api.get(`/professionals/by-specialty/${slug}`, {
+      params: { offset, limit },
+    });
+    return parseListResponse(data);
+  });
 
   return items
     .filter((professional) => professional.is_available)
