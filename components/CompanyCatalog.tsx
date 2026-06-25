@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 
+import { EditProductModal } from './EditProductModal';
 import { useProductImageUpload } from '../hooks/useProductImageUpload';
 import {
   createProduct,
@@ -30,6 +31,7 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
   const [uploadingProductId, setUploadingProductId] = useState<string | null>(
     null,
   );
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -103,26 +105,6 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
     }
   };
 
-  const handleChangeImage = async (product: Product) => {
-    const uri = await pickImage();
-    if (!uri) {
-      return;
-    }
-
-    setUploadingProductId(product.id);
-    setError(null);
-
-    try {
-      const publicUrl = await uploadProductImage(uri, company.id, product.id);
-      await setProductImageUrl(product.id, publicUrl);
-      await loadProducts();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al subir imagen');
-    } finally {
-      setUploadingProductId(null);
-    }
-  };
-
   const busy = saving || uploadingImage;
 
   return (
@@ -159,15 +141,15 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
                 </Text>
               </View>
               <Pressable
-                className="rounded-lg border border-[#E2E8F0] px-3 py-2"
-                onPress={() => void handleChangeImage(product)}
+                className="rounded-lg border border-[#1e3a8a] bg-[#EEF2FF] px-3 py-2"
+                onPress={() => setEditingProduct(product)}
                 disabled={busy}
               >
                 {uploadingProductId === product.id ? (
                   <ActivityIndicator color="#1e3a8a" size="small" />
                 ) : (
-                  <Text className="text-[10px] font-bold text-[#0F172A]">
-                    Imagen
+                  <Text className="text-[10px] font-bold text-[#1e3a8a]">
+                    Editar
                   </Text>
                 )}
               </Pressable>
@@ -249,6 +231,14 @@ export function CompanyCatalog({ company }: CompanyCatalogProps) {
           )}
         </>
       )}
+
+      <EditProductModal
+        product={editingProduct}
+        companyId={company.id}
+        visible={editingProduct !== null}
+        onClose={() => setEditingProduct(null)}
+        onUpdated={() => void loadProducts()}
+      />
 
       {error ? (
         <Text className="mt-3 text-center text-xs text-red-600">{error}</Text>
