@@ -45,6 +45,12 @@ module.exports = ({ config }) => ({
   userInterfaceStyle: 'light',
   scheme: 'listo',
   newArchEnabled: true,
+  updates: {
+    url: 'https://u.expo.dev/c6311bd1-a305-4ec3-9429-d45555911f10',
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
+  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.listo.app',
@@ -89,6 +95,7 @@ module.exports = ({ config }) => ({
       },
     ],
     'expo-router',
+    'expo-updates',
     [
       'expo-location',
       {
