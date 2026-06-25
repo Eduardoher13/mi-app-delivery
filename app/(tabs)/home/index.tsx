@@ -27,7 +27,7 @@ import { formatApiError } from '../../../services/api';
 import { getActiveProducts } from '../../../services/products';
 import { getAvailableProfessionals } from '../../../services/professionals';
 import { Category, Product, ServiceProvider } from '../../../types';
-import { CATEGORIES, MOCK_USER } from '../../../utils/constants';
+import { CATEGORIES } from '../../../utils/constants';
 import { goToNewServiceRequest, goToProfessionalOffer } from '../../../utils/navigation';
 import { isCliente } from '../../../utils/roles';
 
@@ -145,7 +145,7 @@ export default function HomeScreen() {
                 <Ionicons name="notifications-outline" size={20} color="#0F172A" />
               </View>
               <Avatar
-                name={user?.name ?? MOCK_USER.name}
+                name={user?.name ?? 'Usuario'}
                 avatarUrl={user?.avatarUrl}
                 size={40}
               />

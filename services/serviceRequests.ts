@@ -1,9 +1,7 @@
 import { getClientByUserId } from './clients';
 import api from './api';
 import { parseListResponse } from './products';
-import { getUserByEmail } from './users';
 
-import { DEMO_CLIENTE_EMAIL, MOCK_USER } from '../utils/constants';
 import { User } from '../types';
 
 export interface CreateServiceRequestDto {
@@ -30,24 +28,18 @@ export interface ServiceRequest {
   created_at: string;
 }
 
-export async function resolveDemoClientId(): Promise<string> {
-  const user = await getUserByEmail(DEMO_CLIENTE_EMAIL);
-  const client = await getClientByUserId(user.id);
-  return client.id;
-}
-
 export async function resolveClientIdForUser(userId: string): Promise<string> {
   const client = await getClientByUserId(userId);
   return client.id;
 }
 
-/** Cliente logueado real o demo del seed si no hay sesión cliente válida. */
+/** Requiere sesión de cliente válida. */
 export async function resolveClientId(user?: User | null): Promise<string> {
-  if (user?.role === 'cliente' && user.id && user.id !== MOCK_USER.id) {
+  if (user?.role === 'cliente' && user.id) {
     return resolveClientIdForUser(user.id);
   }
 
-  return resolveDemoClientId();
+  throw new Error('Debes iniciar sesión como cliente para continuar');
 }
 
 export async function createServiceRequest(

@@ -2,7 +2,7 @@ import api from './api';
 import { parseListResponse } from './products';
 import { getProductsByCompany } from './products';
 import { getClientById } from './clients';
-import { formatUserName, getUserByEmail, getUserById } from './users';
+import { formatUserName, getFirstAvailableDriver, getUserById } from './users';
 import { fetchAllPages } from '../utils/pagination';
 
 import { CartLine } from '../contexts/CartContext';
@@ -13,7 +13,6 @@ import {
 import {
   DELIVERY_PICKUP_ADDRESS,
   DELIVERY_PICKUP_COORDS,
-  DEMO_REPARTIDOR_EMAIL,
   MANAGUA_COORDS,
 } from '../utils/constants';
 import { DeviceCoords, getDeviceDeliveryCoords } from '../utils/deviceLocation';
@@ -171,9 +170,8 @@ export interface CheckoutResult {
 }
 
 /**
- * Confirma el carrito, marca el pedido como pagado y crea un delivery demo
- * vinculado (repartidor del seed + ruta tienda → casa). Si falla la creación
- * del delivery, el pedido igual queda pagado y deliveryId será null.
+ * Confirma el carrito, marca el pedido como pagado y crea un delivery
+ * vinculado (repartidor disponible + ruta tienda → destino).
  */
 export async function checkoutCart(
   clientId: string,
@@ -224,7 +222,7 @@ async function createDeliveryForOrder(
       return existing.id;
     }
 
-    const driver = await getUserByEmail(DEMO_REPARTIDOR_EMAIL);
+    const driver = await getFirstAvailableDriver();
     const dropoff = details
       ? resolveDropoffFromDetails(details)
       : await getDeviceDeliveryCoords();
@@ -287,7 +285,7 @@ function resolveDropoffFromDetails(details: OrderDeliveryDetails): DeviceCoords 
   };
 }
 
-/** Crea o reutiliza el delivery demo vinculado a un pedido pagado. */
+/** Crea o reutiliza el delivery vinculado a un pedido pagado. */
 export async function ensureDeliveryForOrder(orderId: string): Promise<string | null> {
   return createDeliveryForOrder(orderId);
 }

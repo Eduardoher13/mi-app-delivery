@@ -49,9 +49,7 @@ export default function ProfileScreen() {
       setCompany(data);
     } catch {
       setCompany(null);
-      setCompanyError(
-        'No se encontró empresa para este usuario. Ejecuta npm run seed en el backend.',
-      );
+      setCompanyError('No se encontró empresa para este usuario.');
     }
   }, [showEmpresa, user?.id]);
 

@@ -21,10 +21,6 @@ import { User } from '../types';
 import {
   AUTH_TOKEN_KEY,
   AUTH_USER_KEY,
-  DEMO_CLIENTE_EMAIL,
-  DEMO_EMPRESA_EMAIL,
-  DEMO_PASSWORD,
-  DEMO_PROFESIONAL_EMAIL,
 } from '../utils/constants';
 
 interface AuthContextValue {
@@ -42,9 +38,6 @@ interface AuthContextValue {
   }) => Promise<User>;
   signOut: () => Promise<void>;
   updateAvatarUrl: (avatarUrl: string) => Promise<void>;
-  loginAsClienteDemo: () => Promise<void>;
-  loginAsEmpresaDemo: () => Promise<void>;
-  loginAsProfesionalDemo: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -163,18 +156,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [persistSession],
   );
 
-  const loginAsClienteDemo = useCallback(async (): Promise<void> => {
-    await login(DEMO_CLIENTE_EMAIL, DEMO_PASSWORD);
-  }, [login]);
-
-  const loginAsEmpresaDemo = useCallback(async (): Promise<void> => {
-    await login(DEMO_EMPRESA_EMAIL, DEMO_PASSWORD);
-  }, [login]);
-
-  const loginAsProfesionalDemo = useCallback(async (): Promise<void> => {
-    await login(DEMO_PROFESIONAL_EMAIL, DEMO_PASSWORD);
-  }, [login]);
-
   const signOut = useCallback(async () => {
     await clearSession();
     router.replace('/login' as Href);
@@ -208,9 +189,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       registerCliente,
       signOut,
       updateAvatarUrl,
-      loginAsClienteDemo,
-      loginAsEmpresaDemo,
-      loginAsProfesionalDemo,
     }),
     [
       user,
@@ -220,9 +198,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       registerCliente,
       signOut,
       updateAvatarUrl,
-      loginAsClienteDemo,
-      loginAsEmpresaDemo,
-      loginAsProfesionalDemo,
     ],
   );
 
