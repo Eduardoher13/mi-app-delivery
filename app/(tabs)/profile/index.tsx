@@ -133,7 +133,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 px-4 pt-4" contentContainerClassName="pb-10">
+      <ScrollView className="flex-1 px-4 pt-4 md:px-8 lg:px-10" contentContainerClassName="pb-10">
         <Text className="text-2xl font-black text-[#0F172A]">{profileTitle}</Text>
         {user?.email ? (
           <Text className="mt-1 text-sm text-[#94A3B8]">

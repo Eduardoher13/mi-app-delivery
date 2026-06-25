@@ -82,10 +82,11 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          className="flex-1 px-6"
-          contentContainerClassName="grow justify-center pb-10 pt-8"
+          className="flex-1 px-4 md:px-8"
+          contentContainerClassName="grow justify-center pb-10 pt-8 md:py-12"
           keyboardShouldPersistTaps="handled"
         >
+          <View className="w-full max-w-md self-center">
           <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
             BIENVENIDO A
           </Text>
@@ -156,6 +157,7 @@ export default function LoginScreen() {
           <Text className="mt-2 text-center text-[10px] text-[#94A3B8]">
             Jurado: contraseña {DEMO_PASSWORD}
           </Text>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

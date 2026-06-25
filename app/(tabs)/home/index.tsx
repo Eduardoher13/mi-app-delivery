@@ -120,7 +120,7 @@ export default function HomeScreen() {
       <View className="flex-1">
         <ScrollView
           className="flex-1"
-          contentContainerClassName={showCart ? 'pb-36 px-4' : 'pb-8 px-4'}
+          contentContainerClassName={showCart ? 'pb-36 px-4 md:px-8 lg:px-10' : 'pb-8 px-4 md:px-8 lg:px-10'}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -177,7 +177,7 @@ export default function HomeScreen() {
           <Text className="mb-3 mt-2 text-sm font-black tracking-wide text-[#0F172A]">
             ACCESOS RÁPIDOS
           </Text>
-          <View className="mb-5 flex-row">
+          <View className="mb-5 flex-row md:max-w-xl">
             <QuickActionButton
               label="Solicitar profesional"
               onPress={() => goToNewServiceRequest(router)}
@@ -249,9 +249,12 @@ export default function HomeScreen() {
                   No hay productos recomendados en este momento.
                 </Text>
               ) : (
-                <View className="flex-row flex-wrap items-stretch">
+                <View className="-mx-1.5 flex-row flex-wrap items-stretch">
                   {recommendedProducts.map((product) => (
-                    <View key={product.id} className="mb-3 w-1/2 pr-2">
+                    <View
+                      key={product.id}
+                      className="mb-3 w-1/2 px-1.5 md:w-1/3 lg:w-1/4"
+                    >
                       <ProductCard
                         product={product}
                         showAddButton

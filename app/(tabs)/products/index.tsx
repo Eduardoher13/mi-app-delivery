@@ -85,7 +85,7 @@ export default function ProductsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <View className="flex-1 px-4 pt-4">
+      <View className="flex-1 px-4 pt-4 md:px-8 lg:px-10">
         <Text className="text-2xl font-black text-[#0F172A]">Ferreterías</Text>
         <Text className="mt-1 text-sm text-[#94A3B8]">
           Elige una tienda para ver su catálogo y comprar
@@ -132,14 +132,17 @@ export default function ProductsScreen() {
               />
             }
           >
-            {filteredStores.map((store) => (
-              <CompanyStoreCard
-                key={store.id}
-                company={store}
-                productCount={store.productCount}
-                onPress={openStore}
-              />
-            ))}
+            <View className="-mx-1.5 flex-row flex-wrap">
+              {filteredStores.map((store) => (
+                <View key={store.id} className="mb-3 w-full px-1.5 md:w-1/2 lg:w-1/3">
+                  <CompanyStoreCard
+                    company={store}
+                    productCount={store.productCount}
+                    onPress={openStore}
+                  />
+                </View>
+              ))}
+            </View>
           </ScrollView>
         )}
       </View>

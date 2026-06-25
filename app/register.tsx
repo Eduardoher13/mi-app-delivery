@@ -100,10 +100,11 @@ export default function RegisterScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          className="flex-1 px-6"
-          contentContainerClassName="grow pb-10 pt-8"
+          className="flex-1 px-4 md:px-8"
+          contentContainerClassName="grow pb-10 pt-8 md:py-12"
           keyboardShouldPersistTaps="handled"
         >
+          <View className="w-full max-w-lg self-center">
           <Pressable
             className="mb-4 h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0]"
             onPress={() => router.back()}
@@ -229,6 +230,7 @@ export default function RegisterScreen() {
                 <Text className="text-sm font-bold text-[#1e3a8a]">Inicia sesión aquí</Text>
               </Pressable>
             </Link>
+          </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

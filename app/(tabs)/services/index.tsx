@@ -84,7 +84,7 @@ export default function ServicesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <View className="flex-1 px-4 pt-4">
+      <View className="flex-1 px-4 pt-4 md:px-8 lg:px-10">
         <Text className="text-2xl font-black text-[#0F172A]">{title}</Text>
         <Text className="mt-1 text-sm text-[#94A3B8]">
           {!loading && !error
@@ -169,14 +169,16 @@ export default function ServicesScreen() {
               />
             }
           >
-            {professionals.map((professional) => (
-              <View key={professional.id} className="mb-3">
-                <ProfessionalListCard
-                  service={professional}
-                  onPress={(item) => goToProfessionalOffer(router, item)}
-                />
-              </View>
-            ))}
+            <View className="flex-row flex-wrap">
+              {professionals.map((professional) => (
+                <View key={professional.id} className="mb-3 w-full md:w-1/2 md:pr-2 lg:w-1/3">
+                  <ProfessionalListCard
+                    service={professional}
+                    onPress={(item) => goToProfessionalOffer(router, item)}
+                  />
+                </View>
+              ))}
+            </View>
           </ScrollView>
         )}
       </View>

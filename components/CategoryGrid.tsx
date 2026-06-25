@@ -19,11 +19,11 @@ const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 export function CategoryGrid({ categories, onCategoryPress }: CategoryGridProps) {
   return (
-    <View className="flex-row flex-wrap justify-between">
+    <View className="flex-row flex-wrap gap-y-4 md:gap-x-[3%]">
       {categories.map((category) => (
         <Pressable
           key={category.id}
-          className="mb-4 w-[30%] items-center rounded-xl border border-[#E2E8F0] bg-white py-4"
+          className="w-[30%] items-center rounded-xl border border-[#E2E8F0] bg-white py-4 md:w-[15%]"
           onPress={() => onCategoryPress?.(category)}
         >
           <View className="mb-2 h-12 w-12 items-center justify-center rounded-full bg-[#E2E8F0]">

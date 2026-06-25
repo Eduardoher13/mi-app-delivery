@@ -97,7 +97,7 @@ export default function CompanyStoreScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <View className="flex-1 px-4 pt-4">
+      <View className="flex-1 px-4 pt-4 md:px-8 lg:px-10">
         <View className="flex-row items-center">
           <Pressable
             className="mr-3 h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0]"
@@ -167,9 +167,12 @@ export default function CompanyStoreScreen() {
               />
             }
           >
-            <View className="flex-row flex-wrap items-stretch">
+            <View className="-mx-1.5 flex-row flex-wrap items-stretch">
               {products.map((product) => (
-                <View key={product.id} className="mb-3 w-1/2 pr-2">
+                <View
+                  key={product.id}
+                  className="mb-3 w-1/2 px-1.5 md:w-1/3 lg:w-1/4"
+                >
                   <ProductCard
                     product={product}
                     showAddButton
