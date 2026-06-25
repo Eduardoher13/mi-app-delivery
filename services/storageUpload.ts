@@ -1,26 +1,15 @@
-import {
-  getSupabase,
-  getSupabaseStatus,
-  isSupabaseConfigured,
-  resolveSupabaseConfigForDebug,
-} from './supabase';
-import {
-  SUPABASE_FOLDER_AVATARS,
-  SUPABASE_STORAGE_BUCKET,
-} from '../utils/constants';
-
 import { Platform } from 'react-native';
 
 import {
+  SUPABASE_FOLDER_AVATARS,
+  SUPABASE_STORAGE_BUCKET,
+} from '../utils/constants';
+import {
   getSupabase,
   getSupabaseStatus,
   isSupabaseConfigured,
   resolveSupabaseConfigForDebug,
 } from './supabase';
-import {
-  SUPABASE_FOLDER_AVATARS,
-  SUPABASE_STORAGE_BUCKET,
-} from '../utils/constants';
 
 export interface StorageUploadResult {
   publicUrl: string;
